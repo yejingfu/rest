@@ -55,8 +55,10 @@ app.use(function(err, req, res, next) {
 
 // startup server...
 
-var server = http.createServer(app);
+var port = parseInt(process.env.PORT, 10) || 3000;
+app.set('port', port);
 
+var server = http.createServer(app);
 
 server.listen(port);
 server.on('error', onError);
@@ -83,6 +85,7 @@ function onError(error) {
 
 function onListening() {
   debug('Listening on port ' + server.address().port);
+  console.log('Listening on the port ' + server.address().port);
 }
 
 //module.exports = app;
