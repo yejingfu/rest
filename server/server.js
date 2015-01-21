@@ -33,6 +33,10 @@ server.post('/user/:phone', user.handle);
 server.put('/user/:phone', user.handle);
 server.del('/user/:phone', user.handle);
 
+server.get('/profile/:uid', user.getProfile);
+server.post('/profile/:uid', user.setProfile);
+
+
 server.get('/users', user.list);
 
 server.listen(3011, function() {
