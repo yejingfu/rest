@@ -288,7 +288,7 @@ exports.getAllUsers = function(cb) {
 exports.addNewUser = function(user, profile, cb) {
   if (typeof cb !== 'function') return;
   var ret = {err: errCode.OK, msg: ''};
-  if (user.phone === '' || user.pwd ==== '') {
+  if (user.phone === '' || user.pwd === '') {
     ret.err = errCode.APIPHONEORPWDISEMPTY;
     ret.msg = 'Phone or password is empty';
     cb(ret.err, ret);
@@ -296,7 +296,7 @@ exports.addNewUser = function(user, profile, cb) {
   }
   var ts = util.now();
   var sql = 'insert into user(phone, pwd, status, createdts, updatedts) values("'+
-            user.phone+'","'+user.pwd+'","'+user.status+'","'+ts+'","'+ts'")';
+            user.phone+'","'+user.pwd+'","'+user.status+'","'+ts+'","'+ts+'")';
   exeUpdate(sql, function(err, data) {
     if (err) {
       ret.err = errCode.DBFAILEDADDUSER;
@@ -361,7 +361,7 @@ exports.updateUserProfile = function(uid, profile, cb) {
       var oldprofile = data.profile;
       var profile = mergeProfile(oldprofile, profile);
 
-      var sql = 'update user_profile set nickname="'+profile.nickname+'", gender="'+profile.gender+'", birthday="'+profile.birthday+'", signature="'++profile.signature+'", hobby="'+profile.hobby+'", job="'+profile.job+'", edu="'+profile.edu+'", favoriteauthor="'+profile.favoriteauthor+'", favoritebook="'+profile.favoritebook+'", avatar="'+profile.avatar+'", updatedts="'+ts+'" where uid="'+uid+'" limit 1';
+      var sql = 'update user_profile set nickname="'+profile.nickname+'", gender="'+profile.gender+'", birthday="'+profile.birthday+'", signature="'+profile.signature+'", hobby="'+profile.hobby+'", job="'+profile.job+'", edu="'+profile.edu+'", favoriteauthor="'+profile.favoriteauthor+'", favoritebook="'+profile.favoritebook+'", avatar="'+profile.avatar+'", updatedts="'+ts+'" where uid="'+uid+'" limit 1';
       exeUpdate(sql, function(err, data) {
         cb(err, data);
       });
@@ -373,7 +373,7 @@ var addNewProfile = function(profile, cb) {
   var ts = util.now();
   var ret;
   var sql = 'insert into user_profile(uid, nickname, gender, birthday, signature, hobby, job, edu, favoriteauthor, favoritebook, avatar, createdts, updatedts) values("'+
-  profile.uid+'","'+profile.nickname+'","'+profile.gender+'","'+profile.birthday+'","'+profile.signature+'","'+profile.hobby+'","'+profile.job+'","'+profile.edu+'","'+profile.favoriteauthor+'","'+profile.favoritebook+'","'+profile.avatar+'","'+ts+'","'+ts'")';
+  profile.uid+'","'+profile.nickname+'","'+profile.gender+'","'+profile.birthday+'","'+profile.signature+'","'+profile.hobby+'","'+profile.job+'","'+profile.edu+'","'+profile.favoriteauthor+'","'+profile.favoritebook+'","'+profile.avatar+'","'+ts+'","'+ts+'")';
   exeUpdate(sql, function(err, data) {
     if (err) {
       ret.err = errCode.DBFAILEDADDPROFILE;
