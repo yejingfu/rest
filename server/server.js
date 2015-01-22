@@ -1,4 +1,5 @@
 var restify = require('restify');
+var md5 = require('js-md5');
 var user = require('./user');
 
 var options = {
@@ -24,6 +25,15 @@ function hello_handler(req, res, next) {
   res.send('['+req.method+']: hello ' + req.params.name);
   next();
 }
+
+server.get('/md5/:digest', function(req, res, next) {
+  var digest = req.params.digest;
+  var output = md5(digest);
+  var ret = {err:0, md5: output};
+  res.setHeader('Content-Type', 'text/json');
+  res.end(JSON.stringify(ret));
+  next();
+});
 
 server.get('/hello/:name', hello_handler);
 server.head('/hello/:name', hello_handler);
