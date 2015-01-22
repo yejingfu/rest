@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" type="text/css" href="http://developer.amap.com/Public/css/demo.Default.css" />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="http://webapi.amap.com/maps?v=1.3"></script>
+    <script>
+      var mapObj;
+      function mapInit(){
+        mapObj = new AMap.Map("iCenter");
+        var clickEventListener=AMap.event.addListener(mapObj,'click',function(e){
+		  document.getElementById("barLat").value=e.lnglat.getLng();
+		  document.getElementById("barLong").value=e.lnglat.getLat();  
+        });
+      }
+  </script>
+  </head>
+  <body onLoad="mapInit()">
+    <h1>Add Bar</h1>
+    <hr>
+    <form method='post' enctype='multipart/form-data' action='/bar/add'>
+      <p>Name: <input type='text', name='barName', placeholder='Name'/></p>
+      <p>Address: <input type='text', name='barAddress', placeholder='Address'/></p>
+      <p>Photo: <input type='file', name='barPhoto'/></p>
+      <p>Latitude: <input type='text', id='barLat', name='barLat'/></p>
+      <p>Longitude: <input type='text', id='barLong', name='barLong'/></p>
+      <p><input type='submit', value='Add'/></p>
+    </form>
+    <div id="iCenter"></div>
+  </body>
+</html>
+
+
