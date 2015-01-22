@@ -11,7 +11,7 @@ var parseUserFromRequest = function(req) {
   userdto.uid = req.body.uid || 0;
   userdto.phone = req.body.phone;
   userdto.pwd = req.body.pwd;
-  userdto.status = req.body.status;
+  userdto.status = parseInt(req.body.status);
   return userdto;
 };
 
@@ -19,7 +19,7 @@ var parseProfileFromRequest = function(req) {
   var profiledto = new um.UserProfileDTO();
   profiledto.uid = req.body.uid;
   profiledto.nickname = req.body.nickname;
-  profiledto.gender = parseInt(req.body.gender);
+  profiledto.gender = parseInt(req.body.gender) || 0;
   profiledto.birthday = req.body.birthday;
   profiledto.signature = req.body.signature;
   profiledto.hobby = req.body.hobby;
@@ -28,6 +28,7 @@ var parseProfileFromRequest = function(req) {
   profiledto.favoriteauthor = req.body.favoriteauthor;
   profiledto.favoritebook = req.body.favoritebook;
   profiledto.avatar = req.body.avatar;
+  return profiledto;
 };
 
 exports.handle = function(req, res, next) {
@@ -51,7 +52,11 @@ exports.handle = function(req, res, next) {
   } else if (req.method === 'POST') {
     //util.printReqBody(req);
     var user = parseUserFromRequest(req);
+    user.phone = phone;
     var profile = parseProfileFromRequest(req);
+    //console.log('[post]user:'+JSON.stringify(user.toJSON()));
+    //res.end(JSON.stringify(user.toJSON()));
+    //next();
     um.addNewUser(user, profile, function(err, data) {
       res.end(JSON.stringify(data));
       next();
@@ -59,10 +64,9 @@ exports.handle = function(req, res, next) {
   }  else if (req.method === 'PUT') {
     //util.printReqBody(req);
     // update user password or status
-    var uid = req.body.uid;
     var pwd = req.body.pwd;
     var status = req.body.status;
-    um.updateUser(uid, pwd, status, function(err, data) {
+    um.updateUser(phone, pwd, status, function(err, data) {
       res.end(JSON.stringify(data));
       next();
     });

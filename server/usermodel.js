@@ -16,12 +16,14 @@ var errCode = {
   DBQUERY: 2,
   DBUPDATE:3,
   DBUSERNOTEXIST: 12,
-  DBUSERPROFILENOTEIST: 13,
+  DBUSERPROFILENOTEXIST: 13,
   DBUSERDUP: 14,
   DBFAILEDADDUSER: 15,
   DBFAILEDADDPROFILE: 16,
   DBFAILEDGETUSER: 17,
-  DBFAILEDGETPROFILE:18,
+  DBFAILEDUPDATEUSER: 18,
+  DBFAILEDUPDATEPROFILE:19,
+  DBFAILEDGETPROFILE:20,
   APIUSERIDISEMPTY:40,
   APIPHONEISEMPTY: 41,
   APIPWDISEMPTY: 42,
@@ -72,6 +74,7 @@ var UserProfileDTO = function() {
   this.favoriteauthor = '';
   this.favoritebook = '';
   this.avatar = '';
+  this.updatedts = 0;
 };
 
 UserProfileDTO.prototype = {
@@ -88,7 +91,8 @@ UserProfileDTO.prototype = {
       edu: this.edu,
       favoriteauthor: this.favoriteauthor,
       favoritebook: this.favoritebook,
-      avatar: this.avatar
+      avatar: this.avatar,
+      updatedts: this.updatedts
     };
   },
   fromJSON: function(obj) {
@@ -104,6 +108,7 @@ UserProfileDTO.prototype = {
     this.favoriteauthor = obj.favoriteauthor || '';
     this.favoritebook = obj.favoritebook || '';
     this.avatar = obj.avatar || '';
+    this.updatedts = obj.updatedts || 0;
   }
 };
 
@@ -186,7 +191,7 @@ var exeUpdate = function(sql, cb) {
       ret = {err: errCode.DBCONN, msg: err};
       done();
     } else {
-      conn.update(sql, function(err2, rows) {
+      conn.query(sql, function(err2, rows) {
         if (err2) {
           ret = {err: errCode.DBUPDATE, msg: err2};
         } else {
@@ -241,11 +246,11 @@ exports.getProfileByUID = function(uid, cb) {
     if (err) {
       cb(err, data);
     } else {
-      profile = extractUserProfileDTOFromDB(data);
+      profile = data.length !== 0 ? extractUserProfileDTOFromDB(data[0]) : undefined;
       if (!profile) {
-        ret = {err: errCode.DBUSERPROFILENOTEIST, msg: 'user profile not exists!'};
+        ret = {err: errCode.DBUSERPROFILENOTEXIST, msg: 'user profile not exists!'};
       } else {
-        //console.log('ddd:'+JSON.stringify(dto[0].toJSON()));
+        console.log('ddd:'+JSON.stringify(profile.toJSON()));
         ret.profile = profile;
       }
       cb(ret.err, ret);
@@ -294,6 +299,7 @@ exports.addNewUser = function(user, profile, cb) {
     cb(ret.err, ret);
     return;
   }
+  user.status = user.status || 0;
   var ts = util.now();
   var sql = 'insert into user(phone, pwd, status, createdts, updatedts) values("'+
             user.phone+'","'+user.pwd+'","'+user.status+'","'+ts+'","'+ts+'")';
@@ -330,40 +336,55 @@ exports.addNewUser = function(user, profile, cb) {
   });
 };
 
-exports.updateUser = function(uid, pwd, status, cb) {
-  if (!uid) {
-    cb({err:APIUSERIDISEMPTY, msg:'the user id is empty'});
+exports.updateUser = function(phone, pwd, status, cb) {
+  var ret;
+  if (!phone) {
+    ret = {err:errCode.APIPHONEISEMPTY, msg:'the user phone is empty'}
+    cb(ret.err, ret);
     return;
   }
   var sql;
   if (pwd) {
     sql = 'update user set pwd="'+pwd+'"';
   }
-  if (status) {
+  if (!isNaN(status)) {
     sql = 'update user set status="'+status+'"';
   }
-  if (pwd && status) {
+  if (pwd && !isNaN(status)) {
     sql = 'update user set pwd="'+pwd+'", status="'+status+'"';
   }
-  sql = sql + ', updatedts="'+util.now()+'" where uid="'+uid+'" limit 1';
+  sql += ', updatedts="'+(util.now()+2)+'" where phone="'+phone+'" limit 1';
   exeUpdate(sql, function(err, data) {
-    cb(err, data);
+    if (err) {
+      ret = {err: errCode.DBFAILEDUPDATEUSER, msg: 'Failed to update user'};
+    } else {
+      ret = {err: errCode.OK, msg: 'Success to update user'};    
+    }
+    cb(ret.err, ret);
   });
 };
 
 exports.updateUserProfile = function(uid, profile, cb) {
   var ts = util.now();
   var ret;
+  var dstProfile = profile;
+  console.log('updateUserProfile');
   exports.getProfileByUID(uid, function(err, data){
     if (err) {
       cb(err, data);
     } else {
-      var oldprofile = data.profile;
-      var profile = mergeProfile(oldprofile, profile);
+      var srcProfile = data.profile;
+      console.log('dd--'+srcProfile + '--'+dstProfile);
+      profile = mergeProfile(srcProfile, dstProfile);
 
       var sql = 'update user_profile set nickname="'+profile.nickname+'", gender="'+profile.gender+'", birthday="'+profile.birthday+'", signature="'+profile.signature+'", hobby="'+profile.hobby+'", job="'+profile.job+'", edu="'+profile.edu+'", favoriteauthor="'+profile.favoriteauthor+'", favoritebook="'+profile.favoritebook+'", avatar="'+profile.avatar+'", updatedts="'+ts+'" where uid="'+uid+'" limit 1';
       exeUpdate(sql, function(err, data) {
-        cb(err, data);
+        //cb(err, data);
+        if (err) {
+          ret = {err: errCode.DBFAILEDUPDATEPROFILE, msg: 'Failed to update user profile'};
+        } else {
+          ret = {err: errCode.OK, msg: 'Success to update user profile'};    
+        }
       });
     }
   });
@@ -372,8 +393,54 @@ exports.updateUserProfile = function(uid, profile, cb) {
 var addNewProfile = function(profile, cb) {
   var ts = util.now();
   var ret;
-  var sql = 'insert into user_profile(uid, nickname, gender, birthday, signature, hobby, job, edu, favoriteauthor, favoritebook, avatar, createdts, updatedts) values("'+
-  profile.uid+'","'+profile.nickname+'","'+profile.gender+'","'+profile.birthday+'","'+profile.signature+'","'+profile.hobby+'","'+profile.job+'","'+profile.edu+'","'+profile.favoriteauthor+'","'+profile.favoritebook+'","'+profile.avatar+'","'+ts+'","'+ts+'")';
+  var prefix = 'insert into user_profile(uid';
+  var suffix = ' values("'+profile.uid+'"';
+  if (profile.nickname) {
+    prefix += ', nickname';
+    suffix += ', "'+profile.nickname + '"';
+  }
+  if (!isNaN(profile.gender)) {
+    prefix += ', gender';
+    suffix += ', "'+profile.gender + '"';
+  }
+  if (profile.birthday) {
+    prefix += ', birthday';
+    suffix += ', "'+profile.birthday + '"';
+  }
+  if (profile.signature) {
+    prefix += ', signature';
+    suffix += ', "'+profile.signature + '"';
+  }
+  if (profile.hobby) {
+    prefix += ', hobby';
+    suffix += ', "'+profile.hobby + '"';
+  }
+  if (profile.job) {
+    prefix += ', job';
+    suffix += ', "'+profile.job + '"';
+  }
+  if (profile.edu) {
+    prefix += ', edu';
+    suffix += ', "'+profile.edu + '"';
+  }
+  if (profile.favoriteauthor) {
+    prefix += ', favoriteauthor';
+    suffix += ', "'+profile.favoriteauthor + '"';
+  }
+  if (profile.favoritebook) {
+    prefix += ', favoritebook';
+    suffix += ', "'+profile.favoritebook + '"';
+  }
+  if (profile.avatar) {
+    prefix += ', avatar';
+    suffix += ', "'+profile.avatar + '"';
+  }
+  prefix += ', createdts, updatedts)';
+  suffix += ',"'+ts+'","' + ts + '")';
+
+  var sql = prefix + suffix;
+
+
   exeUpdate(sql, function(err, data) {
     if (err) {
       ret.err = errCode.DBFAILEDADDPROFILE;

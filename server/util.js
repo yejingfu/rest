@@ -26,6 +26,6 @@ exports.printUserList = function(users) {
 };
 
 exports.now = function() {
-  return (new Date()).getTime();   // in milli-seconds from 1970.1.1
-}
+  return Math.floor((new Date()).getTime() / 1000);   // in milli-seconds from 1970.1.1
+};
 
