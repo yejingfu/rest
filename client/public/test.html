@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recommendation</title>
+    <script src="/javascripts/packet.js"></script>
+    <script>
+      function main() {
+
+        var buf = window.buildEchoPacket();
+        var ret = window.parseEchoPacket(buf);
+        alert(JSON.stringify(ret));
+        //var socket = new WebSocket('ws://121.199.58.239:8640');
+        //socket.binaryType = 'arraybuffer';
+//        socket.send(buf);
+      }
+    </script>
+  </head>
+  <body onLoad="main()">
+    <h1>测试</h1>
+    <p>Welcome to 测试页面</p>
+  </body>
+</html>
+

@@ -1,3 +1,5 @@
+(function(exports){
+
 /** construct a packet like below:
 *   --------------------
 *   | length (int32)   |
@@ -14,17 +16,6 @@ var HEAD_SIZE = 12;
 ///
 /// Utilities
 ///
-
-var realign = function(buf, offset, size) {
-  var view = new DataView(buf, offset);
-  var t;
-  for (var i = 0; i < size / 2; i++) {
-    t = view.getUint8(i);
-    view.setUint8(i, view.getUint8(size - i - 1));
-    view.setUint8(size - i - 1, t);
-  }
-}
-
 var buf2str = function(buf, offset) {
   offset = offset || 0;
   var view = new DataView(buf, offset);
@@ -40,7 +31,7 @@ var str2buf = function(buf, offset, str) {
   var len = str.length;
   var view = new DataView(buf, offset);
   view.setInt32(0, len);
-  realign(buf, offset, 4);
+ 
   view = new Uint16Array(buf, offset + 4);
   for (var i = 0; i < len; i++) {
     view[i] = str.charCodeAt(i);
@@ -75,11 +66,6 @@ var buildPacketHeader = function(len, sid, cid) {
   int16view[2] = sid;
   int16view[3] = cid;
   int16view[4] = 1;
-  realign(buf, 0, 4);
-  realign(buf, 4, 2);
-  realign(buf, 6, 2);
-  realign(buf, 8, 2);
-  realign(buf, 10, 2);
   return buf;
 }
 
@@ -116,7 +102,6 @@ var buildEchoPacket = function() {
   var buf = buildPacketHeader(bufLen, 1, 12);
   var view = new DataView(buf, HEAD_SIZE);
   view.setInt32(0, magic);
-  realign(buf, HEAD_SIZE, 4);
   str2buf(buf, HEAD_SIZE + 4, msg);
   return buf;
 }
@@ -142,6 +127,7 @@ var testEchoPacket = function() {
 exports.buildEchoPacket = buildEchoPacket;
 exports.parseEchoPacket = parseEchoPacket;
 
+})(window);
 
 
 

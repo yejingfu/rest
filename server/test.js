@@ -17,17 +17,22 @@ var testEcho = function(cb) {
     cb('OK');
     return;
     */
-
-
+console.log('jeff 1');
+    var buf = packet.buildEchoPacket();
+console.log('jeff 2');
+    var buf2 = util.convertArrayBufferToBuffer(buf);
+console.log('jeff 2.1');
+    var bufstream = new util.BufferStream(buf2);
+console.log('jeff 3');
   var received = false;
   var conn = net.connect({
     port: 8640,
     host: '121.199.58.239'
   }, function() { // get connected
     console.log('connect to server 121.199.58.239');
-    var buf = packet.buildEchoPacket();
+    //var buf = packet.buildEchoPacket();
 
-    var bufstream = new util.BufferStream(util.convertArrayBufferToBuffer(buf));
+    //var bufstream = new util.BufferStream(util.convertArrayBufferToBuffer(buf));
     bufstream.pipe(conn);
     //conn.write(buf);
   });
