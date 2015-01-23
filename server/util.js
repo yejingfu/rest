@@ -1,3 +1,10 @@
+exports.printObject = function(obj, name) {
+  name = name || 'object';
+  for (var k in obj) {
+    console.log(name + '['+k+']: ' + obj[k]);
+  }
+};
+
 exports.printReqHeaders = function(req) {
   console.log('-----begin request headers -----');
   for (var k in req.headers) {
