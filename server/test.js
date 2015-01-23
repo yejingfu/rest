@@ -16,48 +16,65 @@ var testEcho = function(cb) {
     }
     cb('OK');
     return;
-    */
-console.log('jeff 1');
-    var buf = packet.buildEchoPacket();
-console.log('jeff 2');
-    var buf2 = util.convertArrayBufferToBuffer(buf);
-console.log('jeff 2.1');
-    var bufstream = new util.BufferStream(buf2);
-console.log('jeff 3');
+
+  var buf = packet.buildEchoPacket();
+  var buf2 = util.convertArrayBufferToBuffer(buf);
+        console.log('data len:'+buf2.length);
+  //var bufstream = new util.BufferStream(buf2);
+  cb(util.convertBufferToArrayBuffer(buf2));
+  return;
+  */
+  
   var received = false;
+  var data;
   var conn = net.connect({
-    port: 8640,
+    port: 8740,
     host: '121.199.58.239'
   }, function() { // get connected
     console.log('connect to server 121.199.58.239');
-    //var buf = packet.buildEchoPacket();
-
+    var buf = packet.buildEchoPacket();
+    var buf2 = util.convertArrayBufferToBuffer(buf);
+    conn.write(buf2);
+    
     //var bufstream = new util.BufferStream(util.convertArrayBufferToBuffer(buf));
-    bufstream.pipe(conn);
-    //conn.write(buf);
+    //bufstream.pipe(conn);
   });
 
-  conn.on('data', function(data) {
+  conn.on('data', function(chuck) {
     console.log('client received data from server');
-    console.log('data: ' + data.toString());
-    conn.end();
+    //util.printObject(data);
+    console.log('data: ' + chuck.toString());
+    console.log('data len:' + chuck.length + '--'+chuck.readInt32BE(0));
+
+    //console.log('data: ' + data.toString());
+    //conn.end();
     received = true;
-    cb(data);
+    data = chuck;
+    //cb(data);
   });
 
   conn.on('end', function() {
     console.log('connection disconnected');
     if (!received) {
       cb('Failed to receive data to 121.199.58.239');
+    } else {
+      var ab = util.convertBufferToArrayBuffer(data);
+      cb(ab);
     }
+  });
+  
+  conn.on('error', function(err) {
+    console.log('error occurs: '+ err);
   });
 };
 
 exports.run = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
   var target = req.params.target;
   if (target === 'echo') {
     testEcho(function(data) {
-      res.end(data);
+      var ret = packet.parseEchoPacket(data);
+      res.end(JSON.stringify(ret));
     });
   }
 };

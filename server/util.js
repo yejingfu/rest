@@ -48,6 +48,15 @@ exports.convertArrayBufferToBuffer = function(ab) {
   return buffer;
 };
 
+exports.convertBufferToArrayBuffer = function(buf) {
+  var len = buf.length;
+  var ab = new ArrayBuffer(len, 0);
+  var view = new Uint8Array(ab);
+  for (var i = 0; i < len; i++) {
+    view[i] = buf[i];
+  }
+  return ab;
+};
 
 // I turn the given source Buffer into a Readable stream.
 var BufferStream = function( source ) {
