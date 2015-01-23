@@ -6,13 +6,27 @@ var packet = require('./packet');
 //util.printObject(net, 'net');
 
 var testEcho = function(cb) {
+    /** test
+    var buf = packet.buildEchoPacket();
+    var view = new DataView(buf);
+    var view2 = new Int32Array(buf);
+    view2[0] = 0x01020304;
+    for (var i = 0; i < 4; i++) {
+      console.log('no '+i+':'+view.getUint8(i));
+    }
+    cb('OK');
+    return;
+    */
+
+
   var received = false;
   var conn = net.connect({
-    port: 8740,
+    port: 8640,
     host: '121.199.58.239'
   }, function() { // get connected
     console.log('connect to server 121.199.58.239');
     var buf = packet.buildEchoPacket();
+
     var bufstream = new util.BufferStream(util.convertArrayBufferToBuffer(buf));
     bufstream.pipe(conn);
     //conn.write(buf);

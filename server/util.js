@@ -1,4 +1,5 @@
 var util2 = require('util');
+var stream = require('stream');
 
 exports.printObject = function(obj, name) {
   name = name || 'object';
