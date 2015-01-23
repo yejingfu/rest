@@ -13,7 +13,9 @@ var testEcho = function(cb) {
   }, function() { // get connected
     console.log('connect to server 121.199.58.239');
     var buf = packet.buildEchoPacket();
-    client.write(buf);
+    var bufstream = new util.BufferStream(util.convertArrayBufferToBuffer(buf));
+    bufstream.pipe(conn);
+    //conn.write(buf);
   });
 
   conn.on('data', function(data) {
