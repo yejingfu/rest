@@ -29,7 +29,7 @@ var testEcho = function(cb) {
   
   var received = false;
   var conn = net.connect({
-    port: 8740,
+    port: 8640,
     host: '121.199.58.239'
   }, function() { // get connected
     console.log('connect to server 121.199.58.239');
