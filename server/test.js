@@ -3,7 +3,9 @@ var um = require('./usermodel');
 var util = require('./util');
 var packet = require('./packet');
 
-//util.printObject(net, 'net');
+var errCode = {
+  E_FAILED_ECHO: 1
+};
 
 var testEcho = function(cb) {
     /** test
@@ -26,7 +28,6 @@ var testEcho = function(cb) {
   */
   
   var received = false;
-  var data;
   var conn = net.connect({
     port: 8740,
     host: '121.199.58.239'
@@ -42,24 +43,15 @@ var testEcho = function(cb) {
 
   conn.on('data', function(chuck) {
     console.log('client received data from server');
-    //util.printObject(data);
-    console.log('data: ' + chuck.toString());
-    console.log('data len:' + chuck.length + '--'+chuck.readInt32BE(0));
-
-    //console.log('data: ' + data.toString());
-    //conn.end();
     received = true;
-    data = chuck;
-    //cb(data);
+    cb(0, util.convertBufferToArrayBuffer(chuck));
+    conn.end();
   });
 
   conn.on('end', function() {
     console.log('connection disconnected');
     if (!received) {
-      cb('Failed to receive data to 121.199.58.239');
-    } else {
-      var ab = util.convertBufferToArrayBuffer(data);
-      cb(ab);
+      cb(1, {err: errCode.E_FAILED_ECHO, msg: 'Failed to receive data from 121.199.58.239'});
     }
   });
   
@@ -72,9 +64,13 @@ exports.run = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var target = req.params.target;
   if (target === 'echo') {
-    testEcho(function(data) {
-      var ret = packet.parseEchoPacket(data);
-      res.end(JSON.stringify(ret));
+    testEcho(function(err, data) {
+      if (err) {
+        res.end(JSON.stringify(data));
+      } else {
+        var ret = packet.parseEchoPacket(data);
+        res.end(JSON.stringify(ret));
+      }
     });
   }
 };
