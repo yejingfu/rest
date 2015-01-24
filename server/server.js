@@ -2,6 +2,7 @@ var restify = require('restify');
 var md5 = require('js-md5');
 var user = require('./user');
 var test = require('./test');
+var logviewer = require('./logviewer');
 
 var options = {
   // certificate:   // for https
@@ -51,6 +52,8 @@ server.post('/profile/:uid', user.setProfile);
 server.get('/users', user.list);
 
 server.get('/test/:target', test.run);
+
+server.get('/log/:service', logviewer.readlog);
 
 server.listen(3011, function() {
   console.log('%s listening at %s', server.name, server.url);
