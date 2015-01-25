@@ -23,7 +23,7 @@ var realign = function(buf, offset, size) {
     view.setUint8(i, view.getUint8(size - i - 1));
     view.setUint8(size - i - 1, t);
   }
-}
+};
 
 var buf2str = function(buf, offset) {
   offset = offset || 0;
@@ -33,7 +33,7 @@ var buf2str = function(buf, offset) {
   view = new Uint16Array(buf, offset + 4, len/2);
   var str = String.fromCharCode.apply(null, view);
   return str;
-}
+};
 
 var str2buf = function(buf, offset, str) {
  // 2 bytes per charactor
@@ -48,7 +48,8 @@ var str2buf = function(buf, offset, str) {
     view[i] = str.charCodeAt(i);
   }
   return buf;
-}
+};
+
 function buf2strv2(buf) {
   var view = new Uint16Array(buf, 0, 11);
   var str = String.fromCharCode.apply(null, view);
@@ -76,7 +77,7 @@ var appendBuffer = function(buf1, buf2, offset) {
     view1.setUint8(i, view2.getUint8(i));
   }
   return true;
-}
+};
 
 ///
 /// Header
@@ -110,7 +111,7 @@ var buildPacketHeader = function(len, sid, cid) {
   view.setInt16(10, 0);
   
   return buf;
-}
+};
 
 var parsePacketHeader = function(headerBuf) {
 /*
@@ -133,7 +134,7 @@ var parsePacketHeader = function(headerBuf) {
   ret.version = view.getInt16(8);
   ret.reserved = view.getInt16(10);
   return ret;
-}
+};
 
 var testHeader = function() {
   var header = buildPacketHeader(32, 2, 6);
@@ -143,7 +144,7 @@ var testHeader = function() {
   } else {
     console.log('Failed');
   }
-}
+};
 
 ///
 /// Echo
@@ -166,7 +167,7 @@ var buildEchoPacket = function() {
   view.setInt32(0, magic);
   str2buf(buf, HEAD_SIZE + 4, msg);
   return buf;
-}
+};
 
 var parseEchoPacket = function(buf) {
   var ret = parsePacketHeader(buf);
@@ -174,7 +175,7 @@ var parseEchoPacket = function(buf) {
   ret.magic = view.getInt32(0);
   ret.msg = buf2str(buf, HEAD_SIZE + 4);
   return ret;
-}
+};
 
 var testEchoPacket = function() {
   var buf = buildEchoPacket();
@@ -184,10 +185,99 @@ var testEchoPacket = function() {
   }
   var ret = parseEchoPacket(buf);
   console.log('echo packet: ' + JSON.stringify(ret));
+};
+
+///
+/// Register Request & Response
+///
+
+var buildCheckCodePacket = function(phone) {
+  var HS = HEAD_SIZE;
+  var bufLen = HS + 4 + phone.length * 2;
+  var buf = buildPacketHeader(bufLen, 1, 16);
+  var view = new DataView(buf, HS);
+  str2buf(buf, HS, phone);
+  return buf;
+};
+
+var parseCheckCodeResPacket = function(buf) {
+  var ret = parsePacketHeader(buf);
+  var view = new DataView(buf, HEAD_SIZE);
+  ret.phone = buf2str(buf, HEAD_SIZE);
+  ret.serverTime = view.getInt32(4 + ret.phone.length * 2);
+  ret.result = view.getInt32(4 + ret.phone.length * 2 + 4);
+  return ret;
 }
+
+var buildRegisterReqPacket = function(phone, pwd, checkcode, status, ct, cv) {
+  var l1 = 4 + phone.length * 2, 
+      l2 =  4 + pwd.length * 2, 
+      l3 = 4 + checkcode.length * 2
+      l4 = 4,
+      l5 = 4,
+      l6 = 4 + cv.length * 2,
+      HS = HEAD_SIZE;
+  var bufLen = HS + l1 + l2 + l3 + l4 + l5 + l6;
+  var buf = buildPacketHeader(bufLen, 1, 18);
+  var view = new DataView(buf, HS);
+  str2buf(buf, HS, phone);
+  str2buf(buf, HS + l1, pwd);
+  str2buf(buf, HS + l1 + l2, checkcode);
+  view.setInt32(l1 + l2 + l3, status);
+  view.setInt32(l1 + l2 + l3 + l4, ct);
+  str2buf(buf, HS + l1 + l2 + l3 + l4 + l5, cv);
+  return buf;
+};
+
+var parseRegisterResPacket = function(buf) {
+  var HS = HEAD_SIZE;
+  var ret = parsePacketHeader(buf);
+  var view = new DataView(buf, HEAD_SIZE);
+  var offset = 0;
+  ret.serverTime = view.getInt32(offset);
+  offset += 4;
+  ret.result = view.getInt32(offset);
+  offset += 4;
+  ret.status = view.getInt32(offset);
+  offset += 4;
+  ret.uid = buf2str(buf, HS + offset);
+  offset += (4 + ret.uid.length * 2);
+  ret.phone = buf2str(buf, HS + offset);
+  offset += (4 + ret.phone.length * 2);
+  ret.nickName = buf2str(buf, HS + offset);
+  offset += (4 + ret.nickName.length * 2);
+  ret.avatar = buf2str(buf, HS + offset);
+  offset += (4 + ret.avatar.length * 2);
+  ret.gender = view.getInt32(offset);
+  offset += 4;
+  ret.signature = buf2str(buf, HS + offset);
+  offset += (4 + ret.signature.length * 2);
+  ret.birthday = buf2str(buf, HS + offset);
+  offset += (4 + ret.birthday.length * 2);
+  ret.hobby = buf2str(buf, HS + offset);
+  offset += (4 + ret.hobby.length * 2);
+  ret.job = buf2str(buf, HS + offset);
+  offset += (4 + ret.job.length * 2);
+  ret.education = buf2str(buf, HS + offset);
+  offset += (4 + ret.education.length * 2);
+  ret.fav_books = buf2str(buf, HS + offset);
+  offset += (4 + ret.fav_books.length * 2);
+  ret.fav_authors = buf2str(buf, HS + offset);
+  offset += (4 + ret.fav_authors.length * 2);
+  ret.updatedTime = view.getInt32(offset);
+  offset += 4;
+  ret.token = buf2str(buf, HS + offset);
+  return ret;
+};
+
+exports.parsePacketHeader = parsePacketHeader;
 
 exports.buildEchoPacket = buildEchoPacket;
 exports.parseEchoPacket = parseEchoPacket;
+exports.buildCheckCodePacket = buildCheckCodePacket;
+exports.parseCheckCodeResPacket = parseCheckCodeResPacket;
+exports.buildRegisterReqPacket = buildRegisterReqPacket;
+exports.parseRegisterResPacket = parseRegisterResPacket;
 
 
 

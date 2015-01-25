@@ -1,5 +1,6 @@
 var util2 = require('util');
 var stream = require('stream');
+var net = require('net');
 
 exports.printObject = function(obj, name) {
   name = name || 'object';
@@ -57,6 +58,36 @@ exports.convertBufferToArrayBuffer = function(buf) {
   }
   return ab;
 };
+
+exports.connectToServer = function(onConnected, onData, onEnd, onError) {
+  var conn = net.connect({
+    port: 8640,
+    host: '121.199.58.239'
+  }, function() { // get connected
+    console.log('connect to server 121.199.58.239');
+    if (typeof onConnected === 'function')
+      onConnected(conn);
+  });
+
+  conn.on('data', function(chuck) {
+    console.log('received data from server');
+    if (typeof onData === 'function')
+      onData(chuck);
+  });
+
+  conn.on('end', function() {
+    console.log('connection disconnected');
+    if (typeof onEnd === 'function')
+      onEnd();
+  });
+  
+  conn.on('error', function(err) {
+    console.log('error occurs: '+ err);
+    if (typeof onError === 'function')
+      onError();
+  });
+};
+
 
 // I turn the given source Buffer into a Readable stream.
 var BufferStream = function( source ) {
