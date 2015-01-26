@@ -60,6 +60,67 @@ var testEcho = function(cb) {
   });
 };
 
+var testString2Buffer = function(cb) {
+  var ret = {err: 0, msg: 'Okay'};
+  var str = 'Hello 上海';
+  var len = str.length;
+  var buf = new ArrayBuffer(len*2, 0);
+
+  view = new DataView(buf, 0);
+  for (var i = 0; i < len; i++) {
+    view.setUint16(i * 2, str.charCodeAt(i));
+  }  
+
+  /** print
+  view = new DataView(buf, 0);
+  for (var i = 0; i < len*2; i++) {
+    var code = view.getUint8(i);
+    console.log('charCodeAt['+i+']:' + code);
+  }
+  */
+  
+  // buffer to string
+  
+  packet.realignv2(buf, 0, 2, len*2);
+  
+  /* print
+  view = new DataView(buf, 0);
+  for (var i = 0; i < len*2; i++) {
+    var code = view.getUint8(i);
+    console.log('charCodeAt2['+i+']:' + code);
+  }
+  */
+  
+  view = new Uint16Array(buf, 0, len);
+  for (var i = 0; i < len; i++) {
+    console.log('u16['+i+']:'+view[i]);
+  }
+  var str2 = String.fromCharCode.apply(null, view);
+  console.log('str2:'+str2);
+  
+  //
+  console.log('test again');
+  var buf2 = new ArrayBuffer(4 + len * 2, 0);
+  console.log('jeff 1');
+  packet.str2buf(buf2, 0, str);
+  console.log('jeff 2');
+  str2 = packet.buf2str(buf2, 0);
+  console.log('str2:'+str2);
+  
+  //
+  console.log('test again and again');
+  var str3 = 'Hello World';
+  var len3 = str3.length;
+  var buf3 = new ArrayBuffer(4 + len3, 0);
+  console.log('jeff 1');
+  packet.multichar2buf(buf3, 0, str3);
+  console.log('jeff 2');
+  str3 = packet.buf2multichar(buf3, 0);
+  console.log('str3:'+str3);
+  
+  cb(ret);
+};
+
 exports.run = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var target = req.params.target;
@@ -71,6 +132,10 @@ exports.run = function(req, res, next) {
         var ret = packet.parseEchoPacket(data);
         res.end(JSON.stringify(ret));
       }
+    });
+  } else if (target === 'str2buf') {
+    testString2Buffer(function(data) {
+      res.end(JSON.stringify(data));
     });
   }
 };

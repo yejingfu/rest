@@ -13,11 +13,8 @@ exports.register = function(req, res, next) {
   var ret = {err: 1, msg: 'Lack of some parameters'};
   
   if (!phone || !pwd || !checkcode) return res.end(JSON.stringify(ret));
-  
-  var chkCodeBuf = packet.buildCheckCodePacket();
-  
+  var chkCodeBuf = packet.buildCheckCodePacket(phone);
   var registerBuf = packet.buildRegisterReqPacket(phone, pwd, checkcode, status, clientType, clientVersion);
-  
   var conn;
   util.connectToServer(function(conn_) {
     conn = conn_;

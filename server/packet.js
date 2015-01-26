@@ -25,29 +25,59 @@ var realign = function(buf, offset, size) {
   }
 };
 
-var buf2str = function(buf, offset) {
-  offset = offset || 0;
+var realignv2 = function(buf, offset, strike, size) {
   var view = new DataView(buf, offset);
-  var len = view.getInt32(0);
-  //console.log('buf2str len:'+len);
-  view = new Uint16Array(buf, offset + 4, len/2);
-  var str = String.fromCharCode.apply(null, view);
-  return str;
+  var t;
+  for (j = 0; j < size; j += strike) {
+    for (var i = j; i < j + strike / 2; i++) {
+      t = view.getUint8(i);
+      view.setUint8(i, view.getUint8(j + j + strike - i - 1));
+      view.setUint8(j + j + strike - i - 1, t);
+    }
+  }
 };
 
 var str2buf = function(buf, offset, str) {
  // 2 bytes per charactor
   var len = str.length;
-  //console.log('str2buf.length:'+len);
   var view = new DataView(buf, offset);
   view.setInt32(0, len*2);
-  
-  view = new Uint16Array(buf, offset + 4);
-  for (var i = 0; i < len * 2; i++) {
-    //view.setUint16(4 + i * 2, str.charCodeAt(i));
-    view[i] = str.charCodeAt(i);
+  view = new DataView(buf, offset + 4);
+  for (var i = 0; i < len; i++) {
+    view.setUint16(i * 2, str.charCodeAt(i));
   }
   return buf;
+};
+
+var buf2str = function(buf, offset) {
+  offset = offset || 0;
+  var view = new DataView(buf, offset);
+  var len = view.getInt32(0);
+  realignv2(buf, offset + 4, 2, len);  // Important
+  view = new Uint16Array(buf, offset + 4, len/2);
+  var str = String.fromCharCode.apply(null, view);
+  return str;
+};
+
+var multichar2buf = function(buf, offset, str) {
+   // 1 byte per charactor
+  var len = str.length;
+  var view = new DataView(buf, offset);
+  view.setInt32(0, len);
+  view = new DataView(buf, offset + 4);
+  for (var i = 0; i < len; i++) {
+    view.setUint8(i, str.charCodeAt(i));
+  }
+  return buf;
+};
+
+var buf2multichar = function(buf, offset) {
+  offset = offset || 0;
+  var view = new DataView(buf, offset);
+  var len = view.getInt32(0);
+  view = new Uint8Array(buf, offset + 4, len);
+  var str = String.fromCharCode.apply(null, view);
+  return str;
 };
 
 function buf2strv2(buf) {
@@ -193,39 +223,40 @@ var testEchoPacket = function() {
 
 var buildCheckCodePacket = function(phone) {
   var HS = HEAD_SIZE;
-  var bufLen = HS + 4 + phone.length * 2;
+  var bufLen = HS + 4 + phone.length;
   var buf = buildPacketHeader(bufLen, 1, 16);
   var view = new DataView(buf, HS);
-  str2buf(buf, HS, phone);
+  multichar2buf(buf, HS, phone);
   return buf;
 };
 
 var parseCheckCodeResPacket = function(buf) {
   var ret = parsePacketHeader(buf);
   var view = new DataView(buf, HEAD_SIZE);
-  ret.phone = buf2str(buf, HEAD_SIZE);
-  ret.serverTime = view.getInt32(4 + ret.phone.length * 2);
-  ret.result = view.getInt32(4 + ret.phone.length * 2 + 4);
+  ret.phone = buf2multichar(buf, HEAD_SIZE);
+  console.log('parseCheckCodeResPacket-phone:'+ ret.phone);
+  ret.serverTime = view.getInt32(4 + ret.phone.length);
+  ret.result = view.getInt32(4 + ret.phone.length + 4);
   return ret;
 }
 
 var buildRegisterReqPacket = function(phone, pwd, checkcode, status, ct, cv) {
-  var l1 = 4 + phone.length * 2, 
-      l2 =  4 + pwd.length * 2, 
-      l3 = 4 + checkcode.length * 2
+  var l1 = 4 + phone.length, 
+      l2 =  4 + pwd.length, 
+      l3 = 4 + checkcode.length,
       l4 = 4,
       l5 = 4,
-      l6 = 4 + cv.length * 2,
+      l6 = 4 + cv.length,
       HS = HEAD_SIZE;
   var bufLen = HS + l1 + l2 + l3 + l4 + l5 + l6;
   var buf = buildPacketHeader(bufLen, 1, 18);
   var view = new DataView(buf, HS);
-  str2buf(buf, HS, phone);
-  str2buf(buf, HS + l1, pwd);
-  str2buf(buf, HS + l1 + l2, checkcode);
+  multichar2buf(buf, HS, phone);
+  multichar2buf(buf, HS + l1, pwd);
+  multichar2buf(buf, HS + l1 + l2, checkcode);
   view.setInt32(l1 + l2 + l3, status);
   view.setInt32(l1 + l2 + l3 + l4, ct);
-  str2buf(buf, HS + l1 + l2 + l3 + l4 + l5, cv);
+  multichar2buf(buf, HS + l1 + l2 + l3 + l4 + l5, cv);
   return buf;
 };
 
@@ -269,6 +300,13 @@ var parseRegisterResPacket = function(buf) {
   ret.token = buf2str(buf, HS + offset);
   return ret;
 };
+
+exports.realign = realign;
+exports.realignv2 = realignv2;
+exports.str2buf = str2buf;
+exports.buf2str = buf2str;
+exports.multichar2buf = multichar2buf;
+exports.buf2multichar = buf2multichar;
 
 exports.parsePacketHeader = parsePacketHeader;
 
