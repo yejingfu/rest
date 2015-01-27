@@ -4,6 +4,7 @@ var user = require('./user');
 var test = require('./test');
 var logviewer = require('./logviewer');
 var login = require('./login');
+var book = require('./book');
 
 var options = {
   // certificate:   // for https
@@ -59,6 +60,8 @@ server.get('/log/:service', logviewer.readlog);
 server.post('/login/register', login.register);
 server.post('/login/sendcheckcode', login.sendCheckCode);
 server.post('/login/login', login.login);
+
+server.get('/book/isbn/:isbn', book.getBookByISBN);
 
 server.listen(3011, function() {
   console.log('%s listening at %s', server.name, server.url);
