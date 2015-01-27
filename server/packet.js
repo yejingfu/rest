@@ -218,6 +218,72 @@ var testEchoPacket = function() {
 };
 
 ///
+/// Login in
+///
+
+var buildLoginReqPacket = function(phone, pwd, status, ct, cv) {
+  var l1 = 4 + phone.length, 
+      l2 =  4 + pwd.length, 
+      l3 = 4,
+      l4 = 4,
+      l5 = 4 + cv.length,
+      HS = HEAD_SIZE;
+  var bufLen = HS + l1 + l2 + l3 + l4 + l5;
+  var buf = buildPacketHeader(bufLen, 1, 14);
+  var view = new DataView(buf, HS);
+  multichar2buf(buf, HS, phone);
+  multichar2buf(buf, HS + l1, pwd);
+  view.setInt32(l1 + l2, status);
+  view.setInt32(l1 + l2 + l3, ct);
+  multichar2buf(buf, HS + l1 + l2 + l3 + l4, cv);
+  return buf;
+};
+
+var parseLoginResPacket = function(buf) {
+  var HS = HEAD_SIZE;
+  var ret = parsePacketHeader(buf);
+  var view = new DataView(buf, HEAD_SIZE);
+  var offset = 0;
+  ret.serverTime = view.getInt32(offset);
+  offset += 4;
+  ret.result = view.getInt32(offset);
+  return ret; // test only
+  if (ret.result === 0) { 
+    offset += 4;
+    ret.status = view.getInt32(offset);
+    offset += 4;
+    ret.uid = buf2str(buf, HS + offset);
+    offset += (4 + ret.uid.length * 2);
+    ret.phone = buf2str(buf, HS + offset);
+    offset += (4 + ret.phone.length * 2);
+    ret.nickName = buf2str(buf, HS + offset);
+    offset += (4 + ret.nickName.length * 2);
+    ret.avatar = buf2str(buf, HS + offset);
+    offset += (4 + ret.avatar.length * 2);
+    ret.gender = view.getInt32(offset);
+    offset += 4;
+    ret.signature = buf2str(buf, HS + offset);
+    offset += (4 + ret.signature.length * 2);
+    ret.birthday = buf2str(buf, HS + offset);
+    offset += (4 + ret.birthday.length * 2);
+    ret.hobby = buf2str(buf, HS + offset);
+    offset += (4 + ret.hobby.length * 2);
+    ret.job = buf2str(buf, HS + offset);
+    offset += (4 + ret.job.length * 2);
+    ret.education = buf2str(buf, HS + offset);
+    offset += (4 + ret.education.length * 2);
+    ret.fav_books = buf2str(buf, HS + offset);
+    offset += (4 + ret.fav_books.length * 2);
+    ret.fav_authors = buf2str(buf, HS + offset);
+    offset += (4 + ret.fav_authors.length * 2);
+    ret.updatedTime = view.getInt32(offset);
+    offset += 4;
+    ret.token = buf2str(buf, HS + offset);
+  }
+  return ret;
+};
+
+///
 /// Register Request & Response
 ///
 
@@ -315,6 +381,8 @@ exports.parsePacketHeader = parsePacketHeader;
 
 exports.buildEchoPacket = buildEchoPacket;
 exports.parseEchoPacket = parseEchoPacket;
+exports.buildLoginReqPacket = buildLoginReqPacket;
+exports.parseLoginResPacket = parseLoginResPacket;
 exports.buildCheckCodePacket = buildCheckCodePacket;
 exports.parseCheckCodeResPacket = parseCheckCodeResPacket;
 exports.buildRegisterReqPacket = buildRegisterReqPacket;

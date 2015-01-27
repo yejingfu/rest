@@ -62,14 +62,17 @@ exports.login = function(req, res, next) {
   var ret = {err: 1, msg: 'Lack of some parameters'};
   
   if (!phone || !pwd) return res.end(JSON.stringify(ret));
-  var chkCodeBuf = packet.buildCheckCodePacket(phone);
-  var registerBuf = packet.buildRegisterReqPacket(phone, pwd, checkcode, status, clientType, clientVersion);
+  var loginBuf = packet.buildLoginReqPacket(phone, pwd, status, clientType, clientVersion);
   var conn;
   util.connectToServer(function(conn_) {
     conn = conn_;
-    conn.write(util.convertArrayBufferToBuffer(chkCodeBuf));
+    conn.write(util.convertArrayBufferToBuffer(loginBuf));
   }, function(data) {
-  
+    console.log('receive CID_BOOKER_LOGIN_RES...');
+    var buf = util.convertBufferToArrayBuffer(data);
+    ret = packet.parseLoginResPacket(buf);
+    res.end(JSON.stringify(ret));
+    conn.end();    
   });
   
   
