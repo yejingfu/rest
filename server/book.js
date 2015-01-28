@@ -1,6 +1,7 @@
 var http = require('http');
 var util = require('./util');
 var bookmodel = require('./bookmodel');
+var errCode = require('./error');
 
 exports.getBookByISBN = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
@@ -16,7 +17,7 @@ exports.getBookByISBN = function(req, res, next) {
   }
   
   bookmodel.getBookByIsbn(isbn, function(err, data) {
-    if (err) return res.end(JSON.stringify(data));
+    if (err && err !== errCode.DBBOOKNOTEXIST) return res.end(JSON.stringify(data));
     
     var dto = data.book;
     if (dto) {

@@ -92,7 +92,7 @@ var getBookByIsbn = function(isbn, cb) {
     return;
   }
   
-  exeQuery(sql, function(err, data) {
+  util.exeDBQuery(pool, sql, function(err, data) {
     if (err) {
       cb(err, data);
     } else {
