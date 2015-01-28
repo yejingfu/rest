@@ -15,8 +15,9 @@ var pool = mysql.createPool({
 
 exports.dbPool = pool;
 
-exports.exeDBQuery = function (pool, sql, cb) {
-  console.log('exeQuery:'+sql);
+exports.exeDBQuery = function (pool, sql, cb, showSQL) {
+  if (showSQL)
+    console.log('exeQuery:'+sql);
   var ret = {err: 0};
   var done = function() {
     if (typeof cb === 'function') {

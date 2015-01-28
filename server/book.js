@@ -1,7 +1,7 @@
 var http = require('http');
 var util = require('./util');
 var bookmodel = require('./bookmodel');
-var errCode = require('./error');
+var errCode = require('./error').errCode;
 
 exports.getBookByISBN = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
