@@ -1,4 +1,6 @@
 var http = require('http');
+var util = require('./util');
+var bookmodel = require('./bookmodel');
 
 exports.getBookByISBN = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
@@ -13,6 +15,56 @@ exports.getBookByISBN = function(req, res, next) {
     return res.end(JSON.stringify(ret));
   }
   
+  bookmodel.getBookByIsbn(isbn, function(err, data) {
+    if (err) return res.end(JSON.stringify(data));
+    
+    var dto = data.book;
+    if (dto) {
+      console.log('a book is found from DB');
+      return res.end(JSON.stringify(dto.toJSON()));
+    }
+    var client = http.get('http://api.douban.com/v2/book/isbn/' + isbn, function(res2){
+      console.log('Received from douban...');
+      console.log('Status: ' + res2.statusCode);
+      if (res2.statusCode !== 200) {
+        ret.err = errCode.APIBOOKNOTFOUND;
+        ret.msg = 'Failed to get book from douban';
+        res.end(JSON.stringify(ret));
+        return;
+      }
+      var bookdata = '';
+      res2.on('data', function(data2) {
+        bookdata += data2;
+      });
+      res2.on('end', function() {
+        bookmodel.addBookFromDouban(JSON.parse(bookdata), function(err, data3){
+          if (err) return res.end(JSON.stringify(data3));
+          if (data3.book) {
+            res.end(JSON.stringify(data3.book.toJSON()));
+            return;
+          }
+        })
+
+      });
+      res2.on('error', function() {
+        ret.err = errCode.APIBOOKFAILED;
+        ret.msg = 'Failed to parse book from douban';
+        return res.end(JSON.stringify(ret));
+      });
+      res2.read();
+      
+      //res2.pipe(res);
+    });
+    client.on('error', function(e) {
+      console.log('get error from douban: ' + e.message);
+      ret.err = 2;
+      ret.msg = e.message;
+      res.end(JSON.stringify(ret));
+    });
+  
+  });
+  
+  
   /** solution 1
   var client = http.request({
     hostname: 'api.douban.com',
@@ -26,7 +78,7 @@ exports.getBookByISBN = function(req, res, next) {
   */
   
   /** solution 2
-  */
+
   var client = http.get('http://api.douban.com/v2/book/isbn/' + isbn, function(res2){
     console.log('Received from douban...');
     console.log('Status: ' + res2.statusCode);
@@ -38,4 +90,6 @@ exports.getBookByISBN = function(req, res, next) {
     ret.msg = e.message;
     res.end(JSON.stringify(ret));
   });
+  */
+  
 };

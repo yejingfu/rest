@@ -1,35 +1,8 @@
 var util = require('./util');
+var error = require('./error');
+var errCode = error.errCode;
 
-var mysql = require('mysql');
-console.log('create mysql pool...');
-var pool = mysql.createPool({
-  host: '127.0.0.1',
-  port: 3306,
-  user: 'root',
-  password: '123456',
-  database: 'booker'
-});
-
-var errCode = {
-  OK: 0,
-  DBCONN: 1,
-  DBQUERY: 2,
-  DBUPDATE:3,
-  DBUSERNOTEXIST: 12,
-  DBUSERPROFILENOTEXIST: 13,
-  DBUSERDUP: 14,
-  DBFAILEDADDUSER: 15,
-  DBFAILEDADDPROFILE: 16,
-  DBFAILEDGETUSER: 17,
-  DBFAILEDUPDATEUSER: 18,
-  DBFAILEDUPDATEPROFILE:19,
-  DBFAILEDGETPROFILE:20,
-  APIUSERIDISEMPTY:40,
-  APIPHONEISEMPTY: 41,
-  APIPWDISEMPTY: 42,
-  APIPHONEORPWDISEMPTY: 43,
-  UNKNOWN:100
-};
+var pool = util.dbPool;
 
 // class UserDTO
 var UserDTO = function() {

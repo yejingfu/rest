@@ -1,11 +1,57 @@
 var util2 = require('util');
 var stream = require('stream');
 var net = require('net');
+var errCode = require('./error').errCode;
+var mysql = require('mysql');
+
+console.log('create mysql pool...');
+var pool = mysql.createPool({
+  host: '127.0.0.1',
+  port: 3306,
+  user: 'root',
+  password: '123456',
+  database: 'booker'
+});
+
+exports.dbPool = pool;
+
+exports.exeDBQuery = function (pool, sql, cb) {
+  console.log('exeQuery:'+sql);
+  var ret = {err: 0};
+  var done = function() {
+    if (typeof cb === 'function') {
+      if (ret.err) {
+        cb(ret.err, ret);
+      } else {
+        cb(errCode.OK, ret.data);
+      }
+    }
+  };
+
+  pool.getConnection(function(err, conn) {
+    if (err) {
+      ret = {err: errCode.DBCONN, msg: err};
+      done();
+    } else {
+      conn.query(sql, function(err2, rows) {
+        if (err2) {
+          ret = {err: errCode.DBQUERY, msg: err2};
+        } else {
+          ret.data = rows;
+        }
+        conn.release();
+        done();
+      });
+    }
+  });
+};
 
 exports.printObject = function(obj, name) {
   name = name || 'object';
   for (var k in obj) {
-    console.log(name + '['+k+']: ' + obj[k]);
+    //if (obj.hasOwnedProperty(k)) {
+      console.log(name + '['+k+']: ' + obj[k]);
+    //}
   }
 };
 
