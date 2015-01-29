@@ -63,7 +63,7 @@ exports.getBookByISBN = function(req, res, next) {
         };
       
         bookdataObj = JSON.parse(bookdata);
-        bookdataObj.thumbnail = douObj.images.small || douObj.images.medium || douObj.images.large;
+        bookdataObj.thumbnail = bookdataObj.images.small || bookdataObj.images.medium || bookdataObj.images.large;
         if (bookdataObj.thumbnail) {
           util.downloadImage(bookdataObj.thumbnail, function(err, ret) {
             if (!err) {
