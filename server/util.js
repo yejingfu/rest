@@ -18,7 +18,7 @@ var pool = mysql.createPool({
 });
 
 exports.dbPool = pool;
-exports.imageFolder = '.';
+exports.imgFolder = '/opt/booker/storage';
 
 exports.exeDBQuery = function (pool, sql, cb, showSQL) {
   if (showSQL)
@@ -70,7 +70,7 @@ exports.downloadImage = function(url, cb) {
       return onFailed();
     }
     
-    var fileStream = fs.createWriteStream(path.join(exports.imageFolder, imgName));
+    var fileStream = fs.createWriteStream(path.join(exports.imgFolder, imgName));
     res.pipe(fileStream);
     
     res.on('end', function() {

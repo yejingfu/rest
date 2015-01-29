@@ -134,7 +134,7 @@ var addBookFromDouban = function(douObj, cb) {
   book.authorintro = douObj.author_intro;
   book.publisher = douObj.publisher;
   book.pubdate = douObj.pubdate;
-  book.thumbnail = douObj.images.small || douObj.images.medium || douObj.images.large;
+  book.thumbnail = douObj.thumbnail || douObj.images.small || douObj.images.medium || douObj.images.large;
   book.createdts = util.now();
   
   // save to db

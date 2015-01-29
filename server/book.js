@@ -46,19 +46,34 @@ exports.getBookByISBN = function(req, res, next) {
         res.end(JSON.stringify(ret));
         return;
       }
-      var bookdata = '';
+      var bookdata = '', bookdataObj = null;
       res2.on('data', function(data2) {
         bookdata += data2;
       });
       res2.on('end', function() {
-        bookmodel.addBookFromDouban(JSON.parse(bookdata), function(err, data3){
-          if (err) return res.end(JSON.stringify(data3));
-          if (data3.book) {
-            res.end(JSON.stringify(data3.book.toJSON()));
-            return;
-          }
-        })
-
+      
+        var save = function() {
+          bookmodel.addBookFromDouban(bookdataObj, function(err, data3){
+            if (err) return res.end(JSON.stringify(data3));
+            if (data3.book) {
+              res.end(JSON.stringify(data3.book.toJSON()));
+              return;
+            }
+          });
+        };
+      
+        bookdataObj = JSON.parse(bookdata);
+        bookdataObj.thumbnail = douObj.images.small || douObj.images.medium || douObj.images.large;
+        if (bookdataObj.thumbnail) {
+          util.downloadImage(bookdataObj.thumbnail, function(err, ret) {
+            if (!err) {
+              bookdataObj.thumbnail = ret.image;
+            }
+            save();
+          });
+        } else {
+          save();
+        }
       });
       res2.on('error', function() {
         ret.err = errCode.APIBOOKFAILED;
