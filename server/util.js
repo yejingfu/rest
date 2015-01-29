@@ -1,8 +1,12 @@
 var util2 = require('util');
 var stream = require('stream');
 var net = require('net');
+var http = require('http');
+var fs = require('fs-extra');
+var path = require('path');
 var errCode = require('./error').errCode;
 var mysql = require('mysql');
+var uuid = require('node-uuid');
 
 console.log('create mysql pool...');
 var pool = mysql.createPool({
@@ -14,6 +18,7 @@ var pool = mysql.createPool({
 });
 
 exports.dbPool = pool;
+exports.imageFolder = '.';
 
 exports.exeDBQuery = function (pool, sql, cb, showSQL) {
   if (showSQL)
@@ -44,6 +49,46 @@ exports.exeDBQuery = function (pool, sql, cb, showSQL) {
         done();
       });
     }
+  });
+};
+
+exports.downloadImage = function(url, cb) {
+  var ret = {};
+  var onFailed = function() {
+    ret.err = errCode.FAILEDDOWNLOADIMAGE;
+    ret.msg = 'Failed to download image';
+    cb(ret.err, ret);
+  };
+  var idx, ext, imgName;
+  idx = url.lastIndexOf('.');
+  if (idx <= 0) return onFailed();
+  ext = url.substr(idx);
+  imgName = exports.genUUID() + ext;
+  
+  var client = http.get(url, function(res) {
+    if (res.statusCode !== 200) {
+      return onFailed();
+    }
+    
+    var fileStream = fs.createWriteStream(path.join(exports.imageFolder, imgName));
+    res.pipe(fileStream);
+    
+    res.on('end', function() {
+      ret.err = 0;
+      ret.image = imgName;
+      cb(0, ret);
+    });
+
+    res.on('error', function() {
+      console.log('failed');
+      return onFailed();
+    });
+    
+  });
+  
+  client.on('error', function(e){
+    console.log('Failed to donwnload image:'+e.message);
+    return onFailed();
   });
 };
 
@@ -85,6 +130,10 @@ exports.printUserList = function(users) {
 
 exports.now = function() {
   return Math.floor((new Date()).getTime() / 1000);   // in milli-seconds from 1970.1.1
+};
+
+exports.genUUID = function() {
+  return uuid.v4();
 };
 
 exports.convertArrayBufferToBuffer = function(ab) {

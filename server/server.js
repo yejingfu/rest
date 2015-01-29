@@ -62,6 +62,7 @@ server.post('/login/sendcheckcode', login.sendCheckCode);
 server.post('/login/login', login.login);
 
 server.get('/book/isbn/:isbn', book.getBookByISBN);
+server.get('/book/test', book.test);
 
 server.listen(3011, function() {
   console.log('%s listening at %s', server.name, server.url);

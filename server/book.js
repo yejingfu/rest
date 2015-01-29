@@ -3,6 +3,19 @@ var util = require('./util');
 var bookmodel = require('./bookmodel');
 var errCode = require('./error').errCode;
 
+exports.test = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  util.downloadImage('http://img3.douban.com/spic/s27963383.jpg', function(err, ret) {
+    if (err) {
+      res.end(JSON.stringify(ret));
+    } else {
+      //res.setHeader('Content-Type', 'image/jpeg');
+      //res.end(ret);
+      res.end(JSON.stringify(ret));
+    }
+  });
+};
+
 exports.getBookByISBN = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   console.log('isbn:'+req.params.isbn);
