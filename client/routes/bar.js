@@ -46,25 +46,33 @@ router.post('/add', function(req, res) {
     console.log('bar: ' + fields['barName'] + '--' + fields['barAddress']);
     console.log('latitude:' + fields['barLat'] + ', longitude:' + fields['barLong']);
     var images = files['barPhoto'];
+    console.log('bar photo len:'+ images.length);
     if (!images || images.length === 0 || images[0].size === 0) {
       res.end('Failed to upload image: no image received');
       return;
     }
     //printObject(img[0]);
-    img = images[0];
-    var imgName = img.originalFilename;
-    var imgPath = img.path;
-    var imgNewName = path.basename(imgPath);
-    var imgNewPath = path.join(app.get('imagepath'), imgNewName);
-    console.log('moving image from: ' + imgPath + ' ===> to: ' + imgNewPath);
-    fs.move(imgPath, imgNewPath, function(err) {
-      if (err) {
-        res.end('Failed to upload image: ' + err);
-      } else {
-        //res.end('upload done');
-        res.redirect('/bar');
-      }
-    });
+    var count = 0, len = images.length, ok = true;
+    for (var i = 0; i < len; i++) {
+      img = images[i];
+      var imgName = img.originalFilename;
+      var imgPath = img.path;
+      var imgNewName = path.basename(imgPath);
+      var imgNewPath = path.join(app.get('imagepath'), imgNewName);
+      console.log('moving image from: ' + imgPath + ' ===> to: ' + imgNewPath);
+      fs.move(imgPath, imgNewPath, function(err) {
+        count += 1;
+        if (ok) ok = !err;
+        if (count === len - 1) {
+          if (!ok) {
+            res.end('Failed to upload image');
+          } else {
+            //res.end('upload done');
+            res.redirect('/bar');
+          }
+        }
+      });
+    }
 
   });
 });
