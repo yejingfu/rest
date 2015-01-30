@@ -5,6 +5,7 @@ var test = require('./test');
 var logviewer = require('./logviewer');
 var login = require('./login');
 var book = require('./book');
+var bar = require('./bar');
 
 var options = {
   // certificate:   // for https

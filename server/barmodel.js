@@ -167,7 +167,7 @@ var saveToDB = function(dto, cb) {
   var ts = util.now();
   var ret = {};
   var sql = 'insert into bar(bname, tel, address, latitude, longitude, district, rank, photoes, createdts, updatedts) values("'+
-  dto.bname+'","'+dto.tel+'","'+dto.address+'","'+dto.latitude+'","'+dto.longitude+'","'+dto.district+'","'+dto.rank+'","'+dto.photoes+'","'ts+'","'+ts+'")';
+  dto.bname+'","'+dto.tel+'","'+dto.address+'","'+dto.latitude+'","'+dto.longitude+'","'+dto.district+'","'+dto.rank+'","'+dto.photoes+'","'+ts+'","'+ts+'")';
   util.exeDBQuery(pool, sql, function(err, data) {
     if (err) {
       ret.err = errCode.DBFAILEDADDBAR;

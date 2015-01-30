@@ -62,12 +62,12 @@ router.post('/add', function(req, res) {
     
     var saveToDB = function() {
       var barObj = {};
-      barObj.bname = fields['barName'];
-      barObj.tel = fields['barTel'];
-      barObj.address = fields['barAddress'];
-      barObj.latitude = fields['barLat'];
-      barObj.longitude = fields['barLong'];
-      barObj.district = fields['barDistrict'];
+      barObj.bname = fields['barName'][0];
+      barObj.tel = fields['barTel'][0];
+      barObj.address = fields['barAddress'][0];
+      barObj.latitude = fields['barLat'][0];
+      barObj.longitude = fields['barLong'][0];
+      barObj.district = fields['barDistrict'][0];
       barObj.rank = 1;
       barObj.photoes = validImageNames.join(';');
       addBarToServer(barObj, function(err) {
@@ -85,7 +85,7 @@ router.post('/add', function(req, res) {
       imgPath = img.path;
       imgNewName = path.basename(imgPath);
       imgNewPath = path.join(app.get('imagepath'), imgNewName);
-      console.log('==> image: ' + imgNewPath);
+      //console.log('==> image: ' + imgNewPath);
       (function(from, to, newName){
       fs.move(from, to, function(err) {
         count += 1;
@@ -109,18 +109,25 @@ router.post('/add', function(req, res) {
 
 var addBarToServer = function(barObj, cb) {
   var options = {
-    hostname: '121.199.58.239',
+    hostname: 'localhost',    //'121.199.58.239',
     port: 3011,
     path: '/bar',
     method: 'POST'
   };
-  http.request(options, function(res) {
+  var req = http.request(options, function(res) {
     console.log('res status: ' + res.statusCode);
-    cb(0);
+    if (res.statusCode !== 200) {
+      console.log('HEADERS: ' + JSON.stringify(res.headers));
+      cb(1);
+    } else {
+      cb(0);
+    }
   });
   req.on('error', function(e) {
     cb(e);
   });
+  
+  console.log('bar:'+JSON.stringify(barObj));
   
   req.write(JSON.stringify(barObj));
   req.end();
