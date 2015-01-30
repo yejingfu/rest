@@ -64,6 +64,12 @@ server.post('/login/login', login.login);
 server.get('/book/isbn/:isbn', book.getBookByISBN);
 server.get('/book/test', book.test);
 
+server.get('/bar/id/:id', bar.getBarById);
+server.get('/bar/district/:districtid', bar.getBarByDistrictId);
+server.get('/bar/all', bar.getAllBars);
+server.get('/bar/allids', bar.getAllBarIds);
+server.post('/bar', bar.addBar);
+
 server.listen(3011, function() {
   console.log('%s listening at %s', server.name, server.url);
 });
