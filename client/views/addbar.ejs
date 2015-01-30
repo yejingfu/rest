@@ -21,9 +21,28 @@
     <hr>
     <form method='post' enctype='multipart/form-data' action='/bar/add'>
       <p>Name: <input type='text', name='barName', placeholder='Name'/></p>
+      <p>Tel: <input type='text', name='barTel', placeholder='Tel'/></p>
       <p>Address: <input type='text', name='barAddress', placeholder='Address'/></p>
-      <p>Photo: <input type='file', name='barPhoto'/></p>
-      <p>Photo: <input type='file', name='barPhoto'/></p>
+      <p>District: <select name='barDistrict'>
+        <option value='1'>静安区</option>
+        <option value='2'>黄浦区</option>
+        <option value='3'>徐汇区</option>
+        <option value='4'>杨浦区</option>
+        <option value='5'>闵行区</option>
+        <option value='6'>闸北区</option>
+        <option value='7'>松江区</option>
+        <option value='8'>浦东区</option>
+      </select></p>
+      <p>Photo 1: <input type='file', name='barPhoto'/></p>
+      <p>Photo 2: <input type='file', name='barPhoto'/></p>
+      <p>Photo 3: <input type='file', name='barPhoto'/></p>
+      <p>Photo 4: <input type='file', name='barPhoto'/></p>
+      <p>Photo 5: <input type='file', name='barPhoto'/></p>
+      <p>Photo 6: <input type='file', name='barPhoto'/></p>
+      <p>Photo 7: <input type='file', name='barPhoto'/></p>
+      <p>Photo 8: <input type='file', name='barPhoto'/></p>
+      <p>Photo 9: <input type='file', name='barPhoto'/></p>
+      <p>Photo 10: <input type='file', name='barPhoto'/></p>
       <p>Latitude: <input type='text', id='barLat', name='barLat'/></p>
       <p>Longitude: <input type='text', id='barLong', name='barLong'/></p>
       <p><input type='submit', value='Add'/></p>
