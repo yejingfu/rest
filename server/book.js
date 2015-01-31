@@ -16,6 +16,12 @@ exports.test = function(req, res, next) {
   });
 };
 
+exports.getBookCat = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var ret = {err: errCode.NOTIMPLEMENT, msg: 'not implemented'};
+  res.end(JSON.stringify(ret));
+}
+
 exports.getBookByISBN = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   console.log('isbn:'+req.params.isbn);
@@ -122,3 +128,15 @@ exports.getBookByISBN = function(req, res, next) {
   */
   
 };
+
+exports.addBook = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var ret = {err: errCode.NOTIMPLEMENT, msg: 'not implemented'};
+  res.end(JSON.stringify(ret));
+};
+
+exports.exchangeBook = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var ret = {err: errCode.NOTIMPLEMENT, msg: 'not implemented'};
+  res.end(JSON.stringify(ret));
+}

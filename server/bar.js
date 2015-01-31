@@ -96,3 +96,9 @@ exports.addBar2 = function(req, res, next) {
   req.read();
 };
 
+exports.getAllBooks = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var ret = {err: errCode.NOTIMPLEMENT, msg: 'not implemented'};
+  res.end(JSON.stringify(ret));
+};
+

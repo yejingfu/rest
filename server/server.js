@@ -62,15 +62,30 @@ server.post('/login/register', login.register);
 server.post('/login/sendcheckcode', login.sendCheckCode);
 server.post('/login/login', login.login);
 
-server.get('/book/isbn/:isbn', book.getBookByISBN);
+// Book APIs
 server.get('/book/test', book.test);
+server.get('/book/isbn/:isbn', book.getBookByISBN);
+server.get('/book/cat', book.getBookCat);
+// add a book into DB, bind in to bar and user
+// body: isbn(string), barid(int), uid(int), bcat(int)
+server.post('/book/add', book.addBook);
+// body: bisbn(string), uisbn(string), ubookcat(int), bid(int), uid(int)
+server.post('/book/exchange', book.exchangeBook);
 
+// get bar information by id
 server.get('/bar/id/:id', bar.getBarById);
+// get all bars inside of the district
 server.get('/bar/district/:districtid', bar.getBarByDistrictId);
+// get all bars
 server.get('/bar/all', bar.getAllBars);
+// get all bar ids
 server.get('/bar/allids', bar.getAllBarIds);
+// add bar information by POST REST call (experimental)
 server.post('/bar', bar.addBar);
+// add bar information from REST client
 server.post('/bar2', bar.addBar2);
+// get all books from bar
+server.get('/bar/books/:cat', bar.getAllBooks);
 
 server.listen(3011, function() {
   console.log('%s listening at %s', server.name, server.url);
