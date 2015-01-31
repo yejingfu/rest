@@ -9,6 +9,11 @@
     <hr>
     <input type='button' name='addBar' value='Add' onclick='location="/bar/add"'/>
     <p>Welcome to <%= title %></p>
+    <p>
+      <% for (var i = 0, len = bars.length; i < len; i++) { %>
+      <div style="border: dashed gray 1px; margin:4px; padding:4px;"><%= JSON.stringify(bars[i])%></div>
+      <% } %>
+    </p>
   </body>
 </html>
 

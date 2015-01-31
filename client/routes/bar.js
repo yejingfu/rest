@@ -19,10 +19,44 @@ var printObject = function(obj) {
   }
 };
 
+var getAllBars = function(cb) {
+  var client = http.get('http://121.199.58.239:3011/bar/all', function(res) {
+    console.log('received from server:'+ res.statusCode);
+    if (res.statusCode !== 200) {
+      return cb(1, 'statusCode: ' + res.statusCode);
+    } 
+    var data = '', obj;
+    res.on('data', function(d) {
+      data += d;
+    });
+    res.on('end', function() {
+      obj = JSON.parse(data);
+      cb(0, obj);
+    });
+    res.on('error', function(e) {
+      return cb(2, 'Failed to get bar info from server: '+ e);
+    });
+    res.read();
+  });
+  
+  client.on('error', function(e) {
+    cb(3, 'Failed to connect to server: ' + e);
+  });
+};
 
 /* GET users listing. */
 router.get('/', function(req, res) {
-  res.render('bar', { title: 'Booker-bar' });
+  getAllBars(function(err, obj) {
+    var ctx = { title: 'Booker-bar' };
+    ctx.bars = [];
+    if (err) {
+      ctx.err = obj;
+    } else {
+      ctx.bars = obj.bars;
+    }
+    console.log('ctx:'+JSON.stringify(ctx));
+    res.render('bar', ctx);
+  });
 });
 
 router.get('/add', function(req, res) {
