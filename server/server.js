@@ -70,6 +70,7 @@ server.get('/bar/district/:districtid', bar.getBarByDistrictId);
 server.get('/bar/all', bar.getAllBars);
 server.get('/bar/allids', bar.getAllBarIds);
 server.post('/bar', bar.addBar);
+server.post('/bar2', bar.addBar2);
 
 server.listen(3011, function() {
   console.log('%s listening at %s', server.name, server.url);

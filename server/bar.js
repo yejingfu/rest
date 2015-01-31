@@ -69,3 +69,30 @@ exports.addBar = function(req, res, next) {
   });
 };
 
+exports.addBar2 = function(req, res, next) {
+  // get post request from Node.js client 
+  res.setHeader('Content-Type', 'text/json');
+  
+  var data = '', ret = {}, obj;
+  req.on('data', function(chunk) {
+    data += chunk;
+  });
+  req.on('end', function() {
+    obj = JSON.parse(data);
+    barmodel.addBar(obj, function(err, data2) {
+      if (err) {
+        console.log('Failed to add bar into DB');
+      } else {
+        console.log('Succeed to add bar into DB');
+        res.end(JSON.stringify(data2));
+      }
+    });
+  });
+  req.on('error', function(e) {
+    ret.err = errCode.APIBARFAILED;
+    ret.msg = 'Failed to read request from client';
+    res.end(JSON.stringify(ret));
+  });
+  req.read();
+};
+

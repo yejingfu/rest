@@ -28,6 +28,7 @@ router.get('/', function(req, res) {
 router.get('/add', function(req, res) {
   res.render('addbar', {title: 'add bar'});
 });
+
 router.post('/add', function(req, res) {
   //printBody(req);
   //var name = req.body.bar.name;
@@ -92,7 +93,7 @@ router.post('/add', function(req, res) {
         if (!err) {
           validImageNames.push(newName);
         }
-        if (count === len - 1) {
+        if (count === len) {
           if (validImageNames.length === 0) {
             res.end('Failed to upload image');
           } else {
@@ -111,7 +112,7 @@ var addBarToServer = function(barObj, cb) {
   var options = {
     hostname: 'localhost',    //'121.199.58.239',
     port: 3011,
-    path: '/bar',
+    path: '/bar2',
     method: 'POST'
   };
   var req = http.request(options, function(res) {
