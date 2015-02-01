@@ -3,6 +3,8 @@ var util = require('./util');
 var bookmodel = require('./bookmodel');
 var errCode = require('./error').errCode;
 
+var pool = util.dbPool;
+
 exports.test = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   util.downloadImage('http://img3.douban.com/spic/s27963383.jpg', function(err, ret) {
@@ -18,8 +20,22 @@ exports.test = function(req, res, next) {
 
 exports.getBookCat = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
-  var ret = {err: errCode.NOTIMPLEMENT, msg: 'not implemented'};
-  res.end(JSON.stringify(ret));
+  var ret = {err: 0};
+  var sql = 'select * from bookcat';
+  var cats = [];
+  util.exeDBQuery(pool, sql, function(err, rows) {
+    if (err) {
+      ret.err = err;
+      ret.msg = 'Failed to get book catogory';
+      return res.end(JSON.stringify(ret));
+    } else {
+      for (var i = 0, len = rows.length; i < len; i++) {
+        cats.push(rows[i]);
+      }
+      ret.cats = cats;
+      return res.end(JSON.stringify(ret));
+    }
+  });
 }
 
 exports.getBookByISBN = function(req, res, next) {

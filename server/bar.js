@@ -24,7 +24,7 @@ exports.getBarByDistrictId = function(req, res, next) {
   var districtId = req.params.districtid;
   barmodel.getBarByDistrictId(districtId, function(err, data) {
     if (err) console.log('Failed to get bar by district id');
-    if (data && data.bar) {
+    if (data && data.bars) {
       res.end(JSON.stringify(data));
     } else {
       var ret = {err: errCode.APIBARFAILED, msg: 'Failed to get bar'};
