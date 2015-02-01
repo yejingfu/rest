@@ -92,6 +92,25 @@ exports.downloadImage = function(url, cb) {
   });
 };
 
+exports.getImageStreamByName = function(req, res, next) {
+  var imgPath = path.join(exports.imgFolder, req.params.name||'unknown.png');
+  var ret = {};
+  var img;
+  fs.exists(imgPath, function(yes) {
+    if (yes) {
+      img = fs.createReadStream(imgPath);
+      res.setHeader('Content-Type', 'image/jpeg');
+      img.pipe(res);
+      
+    } else {
+      ret.err = errCode.APIIMAGENOTEXIST;
+      ret.msg = 'Image does not exist!';
+      res.setHeader('Content-Type', 'text/json');
+      res.end(JSON.stringify(ret));
+    }
+  });
+};
+
 exports.printObject = function(obj, name) {
   name = name || 'object';
   for (var k in obj) {

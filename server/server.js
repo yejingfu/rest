@@ -6,6 +6,7 @@ var logviewer = require('./logviewer');
 var login = require('./login');
 var book = require('./book');
 var bar = require('./bar');
+var util = require('./util');
 
 var options = {
   // certificate:   // for https
@@ -86,6 +87,8 @@ server.post('/bar', bar.addBar);
 server.post('/bar2', bar.addBar2);
 // get all books from bar
 server.get('/bar/books/:cat', bar.getAllBooks);
+
+server.get('/image/:name', util.getImageStreamByName);
 
 server.listen(3011, function() {
   console.log('%s listening at %s', server.name, server.url);

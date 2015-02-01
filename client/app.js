@@ -17,7 +17,8 @@ var app = express();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-app.set('imagepath', path.join(__dirname, 'public', 'images'));
+//app.set('imagepath', path.join(__dirname, 'public', 'images'));
+app.set('imagepath', '/opt/booker/storage'));
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
