@@ -70,7 +70,7 @@ server.get('/book/cat', book.getBookCat);
 // add a book into DB, bind in to bar and user
 // body: isbn(string), barid(int), uid(int), bcat(int)
 server.post('/book/add', book.addBook);
-// body: bisbn(string), uisbn(string), ubookcat(int), bid(int), uid(int)
+// body: barid(int), bisbn(string), uisbn(string), ubookcat(int), uid(int)
 server.post('/book/exchange', book.exchangeBook);
 
 // get bar information by id
@@ -85,8 +85,10 @@ server.get('/bar/allids', bar.getAllBarIds);
 server.post('/bar', bar.addBar);
 // add bar information from REST client
 server.post('/bar2', bar.addBar2);
-// get all books from bar
-server.get('/bar/books/:cat', bar.getAllBooks);
+// get all books from bar, inputs: `barid` and `bookcat`
+server.get('/bar/books', bar.getAllBooks);
+
+server.get('/districts', util.getAllDistricts);
 
 server.get('/image/:name', util.getImageStreamByName);
 

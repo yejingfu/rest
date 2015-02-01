@@ -111,6 +111,27 @@ exports.getImageStreamByName = function(req, res, next) {
   });
 };
 
+exports.getAllDistricts = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var sql = 'select * from district';
+  var ret = {}, idx, len;
+  exports.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      ret.err = err;
+      ret.msg = 'Failed to get district list';
+      res.end(JSON.stringify(ret));
+    } else {
+      ret.err = 0;
+      ret.districts = [];
+      for (idx = 0, len = data.length; idx < len; idx++) {
+        ret.districts.push(data[idx]);
+      }
+      res.end(JSON.stringify(ret));
+    }
+  });
+
+};
+
 exports.printObject = function(obj, name) {
   name = name || 'object';
   for (var k in obj) {
