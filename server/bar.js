@@ -47,7 +47,7 @@ exports.getAllBarIds = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   barmodel.getAllBarIds(function(err, data){
     if (err) console.log('Failed to get all bar ids');
-    res.end(stringify(data));
+    res.end(JSON.stringify(data));
   });
 };
 

@@ -63,7 +63,8 @@ var getAllBars = function(cb) {
     } else {
       dto = extractBarDTOFromDB(data);
       if (dto.length === 0) {
-        ret = {err: errCode.DBBARNOTEXIST, msg: 'bar not exists!'};
+        //ret = {err: errCode.DBBARNOTEXIST, msg: 'bar not exists!'};
+        ret.bars = [];
       } else {
         //console.log('ddd:'+JSON.stringify(dto[0].toJSON()));
         ret.bars = dto;
