@@ -129,7 +129,7 @@ var getBarByDistrictId = function(districtId, cb) {
   if (!districtId || districtId === 0) {
     return getAllBars(cb);
   }
-  var sql = 'select * from bar where district='+districtId+' limit 1';
+  var sql = 'select * from bar where district='+districtId;
   var dto;
   var ret = {err: 0};
   if (typeof cb !== 'function') {
@@ -142,12 +142,11 @@ var getBarByDistrictId = function(districtId, cb) {
     } else {
       dto = extractBarDTOFromDB(data);
       if (dto.length === 0) {
-        ret = {err: errCode.DBBARNOTEXIST, msg: 'bar not exists!'};
-      } else if (dto.length > 1) {
-        ret = {err: errCode.DBBARDUP, msg: 'duplicated bars!'};
+        //ret = {err: errCode.DBBARNOTEXIST, msg: 'bar not exists!'};
+        ret.bars = [];
       } else {
         //console.log('ddd:'+JSON.stringify(dto[0].toJSON()));
-        ret.bar = dto[0];
+        ret.bars = dto;
       }
       cb(ret.err, ret);
     }
