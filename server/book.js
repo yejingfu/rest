@@ -281,7 +281,7 @@ exports.exchangeBook = function(req, res, next) {
     // get user's book.
     bookmodel.getBookByIsbn(uisbn, function(err2, data2) {
       if (err2 && err2 !== errCode.DBBOOKNOTEXIST) return res.end(JSON.stringify(data2));    
-      var bookDtoByUser = data.book;
+      var bookDtoByUser = data2.book;
       if (!bookDtoByUser) {
         downloadBookFromDouban(uisbn, ubookcat, function(err3, data3) {
           if (err3) return res.end(JSON.stringify(data3));
@@ -293,6 +293,8 @@ exports.exchangeBook = function(req, res, next) {
           }
           doExchange(bookDto.bkid, bookDtoByUser.bkid);
         });
+      } else {
+        doExchange(bookDto.bkid, bookDtoByUser.bkid);
       }
     });
   });
