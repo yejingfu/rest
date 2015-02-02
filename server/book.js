@@ -209,7 +209,11 @@ exports.addBook = function(req, res, next) {
   //var uid = req.body.uid;
   var bcat = req.body.bcat || 9;
   var sql;
-  console.log('addBook:'+isbn + '--'+barid + '--'+uid+'--'+bcat);
+  if (!barid || !isbn) {
+    ret.err = errCode.APIPARAMSMISSING;
+    ret.msg = 'Some request params are missing';
+    return res.end(JSON.stringify(ret));
+  }
   var afterBookAdded = function(bookDto) {
     // add into DB `bar_shelf`
     bookmodel.addBookToBarShelf(bookDto.bkid, barid, function(err, data) {
@@ -239,7 +243,7 @@ exports.exchangeBook = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var ret = {err: 0};
   var barid = req.body.barid;
-  var bisbn = req.body.isbn;
+  var bisbn = req.body.bisbn;
   var uid = req.body.uid;
   var uisbn = req.body.uisbn;
   var ubookcat = req.body.ubookcat || 9;
