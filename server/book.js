@@ -204,10 +204,10 @@ exports.getBookByISBN = function(req, res, next) {
 exports.addBook = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var ret = {err: 0};
-  var isbn = req.params.isbn;
-  var barid = req.params.barid;
-  //var uid = req.params.uid;
-  var bcat = req.params.bcat || 9;
+  var isbn = req.body.isbn;
+  var barid = req.body.barid;
+  //var uid = req.body.uid;
+  var bcat = req.body.bcat || 9;
   var sql;
   console.log('addBook:'+isbn + '--'+barid + '--'+uid+'--'+bcat);
   var afterBookAdded = function(bookDto) {
@@ -238,35 +238,33 @@ exports.addBook = function(req, res, next) {
 exports.exchangeBook = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var ret = {err: 0};
-  var barid = req.params.barid;
-  var bisbn = req.params.isbn;
-  var uid = req.params.uid;
-  var uisbn = req.params.uisbn;
-  var ubookcat = req.params.ubookcat || 9;
+  var barid = req.body.barid;
+  var bisbn = req.body.isbn;
+  var uid = req.body.uid;
+  var uisbn = req.body.uisbn;
+  var ubookcat = req.body.ubookcat || 9;
   var sql;
   var ts = util.now();
-
-  var afterBookAdded = function(bookDto) {
-    // add into DB `bar_shelf`
-    bookmodel.addBookToBarShelf(bookDto.bkid, barid, function(err, data) {
-      return res.end(JSON.stringify(data));
-    });
-  };
+  
+  if (!barid || !bisbn || !uid || !uisbn) {
+    ret.err = errCode.APIPARAMSMISSING;
+    ret.msg = 'Some request params are missing';
+    return res.end(JSON.stringify(ret));
+  }
   
   var doExchange = function(bookid1, bookid2) {
     bookmodel.removeBookFromBarShelf(bookid1, barid, function(err, data) {
       if (err) return res.end(JSON.stringify(data));
-      bookmodel.addBookToBarShelf(bookid2, barid, function(err2, data2)) {
+      bookmodel.addBookToBarShelf(bookid2, barid, function(err2, data2) {
         if (err) return res.end(JSON.stringify(data2));
         ret.err = 0;
         ret.msg = 'Succeed to exchange book';
         return res.end(JSON.stringify(ret));
-      }
+      });
     });
   
   };
-  
-  // TODO: get book from bar
+
   bookmodel.getBookByIsbn(bisbn, function(err, data) {
     if (err) return res.end(JSON.stringify(data));
     var bookDto = data.book;

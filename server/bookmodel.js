@@ -160,7 +160,7 @@ var addBookFromDouban = function(douObj, cb) {
   book.subtitle = douObj.subtitle;
   book.summary = douObj.summary;
   book.catalog = douObj.catalog;
-  book.internalcat = 0;
+  book.internalcat = 9;
   book.author = douObj.author.join(';');
   book.authorintro = douObj.author_intro;
   book.publisher = douObj.publisher;
@@ -239,7 +239,7 @@ var removeBookFromBarShelf = function(bkid, barid, cb) {
         var status = rows[0].status;
         if (copy < 0) copy = 0;
         if (copy === 0) status = 1;
-        sql = 'update bar_shelf set copy="'+copy+'", status="'+status+'", updatedts="'+ts+'" where bsid="'+rows[0].bsid'"';
+        sql = 'update bar_shelf set copy="'+copy+'", status="'+status+'", updatedts="'+ts+'" where bsid="'+rows[0].bsid+'"';
         util.exeDBQuery(pool, sql, function(err3, data3) {
           if (err3) {
             ret.err = errCode.DBUPDATE;

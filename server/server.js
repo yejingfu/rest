@@ -69,9 +69,8 @@ server.get('/book/test', book.test);
 server.get('/book/isbn/:isbn', book.getBookByISBN);
 // add a book into DB, bind in to bar and user
 // body: isbn(string), barid(int), uid(int), bcat(int)
-// To be tested
 server.post('/book/add', book.addBook);
-// body: barid(int), bisbn(string), uisbn(string), ubookcat(int), uid(int)
+// body: barid(int), bisbn(string), uid(int), uisbn(string), ubookcat(int)
 // To be tested
 server.post('/book/exchange', book.exchangeBook);
 

@@ -108,7 +108,7 @@ exports.getAllBooks = function(req, res, next) {
   util.exeDBQuery(util.dbPool, sql, function(err, data) {
     if (err) return res.end(JSON.stringify(data));
     for (var i = 0, len = data.length; i < len; i++) {
-      bkids.[data[i].bkid] = data[i].copy;
+      bkids[data[i].bkid] = data[i].copy;
     }
     ret.books = [];
     bookmodel.getBookByBkIds(Object.keys(bkids), bookcat, function(err2, data2) {
