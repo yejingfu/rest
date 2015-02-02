@@ -110,6 +110,37 @@ var getBookByIsbn = function(isbn, cb) {
   });
 };
 
+var getBookByBkIds = function(bkids, bkcat, cb) {
+  var sql = 'select * from book where bkid in(';
+  for (var i = 0, len = bkids.length - 1; i < len; i++) {
+    sql += '"'+bkids[i]+'", ';
+  }
+  sql += '"'+bkids[i]+'")';
+  if (bkcat && bkcat !== 0) {
+    sql += ' and internalcat="'+bkcat+'"';
+  }
+  var dtolist;
+  var ret = {err: 0};
+  if (typeof cb !== 'function') {
+    return;
+  }
+  
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      cb(err, data);
+    } else {
+      dtolist = extractBookDTOFromDB(data);
+      if (dtolist.length === 0) {
+        ret = {err: errCode.DBBOOKNOTEXIST, msg: 'book not exists!'};
+      } else {
+        //console.log('ddd:'+JSON.stringify(dto[0].toJSON()));
+        ret.books = dtolist;
+      }
+      cb(ret.err, ret);
+    }
+  });
+};
+
 var extractBookDTOFromDB = function(rows) {
   var dto = [];
   for (var i = 0, len = rows.length; i < len; i++) {
@@ -143,7 +174,94 @@ var addBookFromDouban = function(douObj, cb) {
   });
 };
 
+var addBookToBarShelf = function(bkid, barid, cb) {
+  var ret = {err: 0};
+  var sql = 'select * from bar_shelf where bkid="'+bkid+'" and barid="'+barid+'" limit 1';
+  var rows;
+  var ts = util.now();
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      cb(err, data);
+    } else {
+      rows = data;
+      if (rows.length === 0) {
+        // insert 
+        sql = 'insert into bar_shelf(bkid, barid, createdts, updatedts) values("'+bkid+'", "'+barid+'", "'+ts+'", "'+ts+'")';
+        util.exeDBQuery(pool, sql, function(err2, data2) {
+          if (err2) {
+            ret.err = errCode.DBUPDATE;
+            ret.msg = 'Failed to insert bar-book into bar_shelf : ' + data2;
+          } else {
+            ret.err = 0;
+          }
+          cb(ret.err, ret);
+        });
+      } else if (rows.length === 1) {
+        // update copies
+        //var copy = parseInt(rows[0].copy) + 1;
+        var copy = rows[0].copy + 1;
+        sql = 'update bar_shelf set copy="'+copy+'", status="0", updatedts="'+ts+'" where bsid="'+rows[0].bsid+'"';
+        util.exeDBQuery(pool, sql, function(err3, data3) {
+          if (err3) {
+            ret.err = errCode.DBUPDATE;
+            ret.msg = 'Failed to update copies of bar-book in bar_shelf : ' + data3;
+          } else {
+            ret.err = 0;
+          }
+          cb(ret.err, ret);
+        });
+      } else {
+        ret.err = errCode.DBQUERY;
+        ret.msg = 'duplicated book-bar record in bar_shelf';
+        cb(ret.err, ret);
+      }
+    }
+  });
+};
+
+var removeBookFromBarShelf = function(bkid, barid, cb) {
+  var ret = {err: 0};
+  var sql = 'select * from bar_shelf where bkid="'+bkid+'" and barid="'+barid+'" limit 1';
+  var rows;
+  var ts = util.now();
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      cb(err, data);
+    } else {
+      rows = data;
+      if (rows.length === 0) {
+        ret.msg = 'No book '+bkid+' found in the bar '+barid;
+        cb(ret.err, ret);
+      } else if (rows.length === 1) {
+        // update copies
+        //var copy = parseInt(rows[0].copy) + 1;
+        var copy = rows[0].copy - 1;
+        var status = rows[0].status;
+        if (copy < 0) copy = 0;
+        if (copy === 0) status = 1;
+        sql = 'update bar_shelf set copy="'+copy+'", status="'+status+'", updatedts="'+ts+'" where bsid="'+rows[0].bsid'"';
+        util.exeDBQuery(pool, sql, function(err3, data3) {
+          if (err3) {
+            ret.err = errCode.DBUPDATE;
+            ret.msg = 'Failed to update copies of bar-book in bar_shelf : ' + data3;
+          } else {
+            ret.err = 0;
+          }
+          cb(ret.err, ret);
+        });
+      } else {
+        ret.err = errCode.DBQUERY;
+        ret.msg = 'duplicated book-bar record in bar_shelf';
+        cb(ret.err, ret);
+      }
+    }
+  });
+};
+
 exports.BookDTO = BookDTO;
 exports.getBookByIsbn = getBookByIsbn;
+exports.getBookByBkIds = getBookByBkIds;
 exports.addBookFromDouban = addBookFromDouban;
+exports.addBookToBarShelf = addBookToBarShelf;
+exports.removeBookFromBarShelf = removeBookFromBarShelf;
 

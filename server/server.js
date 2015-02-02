@@ -64,13 +64,15 @@ server.post('/login/sendcheckcode', login.sendCheckCode);
 server.post('/login/login', login.login);
 
 // Book APIs
+server.get('/bookcategory', book.getBookCat);
 server.get('/book/test', book.test);
 server.get('/book/isbn/:isbn', book.getBookByISBN);
-server.get('/book/cat', book.getBookCat);
 // add a book into DB, bind in to bar and user
 // body: isbn(string), barid(int), uid(int), bcat(int)
+// To be tested
 server.post('/book/add', book.addBook);
 // body: barid(int), bisbn(string), uisbn(string), ubookcat(int), uid(int)
+// To be tested
 server.post('/book/exchange', book.exchangeBook);
 
 // get bar information by id
@@ -86,6 +88,7 @@ server.post('/bar', bar.addBar);
 // add bar information from REST client
 server.post('/bar2', bar.addBar2);
 // get all books from bar, inputs: `barid` and `bookcat`
+// To be tested
 server.get('/bar/books', bar.getAllBooks);
 
 server.get('/districts', util.getAllDistricts);

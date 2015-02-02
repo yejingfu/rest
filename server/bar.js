@@ -3,6 +3,7 @@
 var http = require('http');
 var util = require('./util');
 var barmodel = require('./barmodel');
+var bookmodel = require('./bookmodel');
 var errCode = require('./error').errCode;
 
 exports.getBarById = function(req, res, next) {
@@ -98,7 +99,27 @@ exports.addBar2 = function(req, res, next) {
 
 exports.getAllBooks = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
-  var ret = {err: errCode.NOTIMPLEMENT, msg: 'not implemented'};
-  res.end(JSON.stringify(ret));
+  var barid = req.params.barid;
+  var bookcat = req.params.bookcat || 0;
+  var sql;
+  var ret = {err: 0};
+  var bkids = {};
+  sql = 'select * from bar_shelf where barid="'+barid+'" and copy>0 and status=0';
+  util.exeDBQuery(util.dbPool, sql, function(err, data) {
+    if (err) return res.end(JSON.stringify(data));
+    for (var i = 0, len = data.length; i < len; i++) {
+      bkids.[data[i].bkid] = data[i].copy;
+    }
+    ret.books = [];
+    bookmodel.getBookByBkIds(Object.keys(bkids), bookcat, function(err2, data2) {
+      if (err2 || !data2.books) return res.end(JSON.stringify(data2));
+      for (var i = 0, len = data2.books.length; i < len; i++) {
+        data2.books[i].copy = bkids[data2.books[i].bkid].copy;
+        ret.books.push(data2.books[i]);
+      }
+      return res.end(JSON.stringify(ret));
+    });
+  });
+
 };
 

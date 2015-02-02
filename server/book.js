@@ -5,6 +5,61 @@ var errCode = require('./error').errCode;
 
 var pool = util.dbPool;
 
+/**
+* Download book info from Douban and then save into local DB.
+*/
+var downloadBookFromDouban = function(isbn, bcat, cb) {
+    var ret = {};
+    var client = http.get('http://api.douban.com/v2/book/isbn/' + isbn, function(res){
+      console.log('Received from douban: ' + res.statusCode);
+      if (res.statusCode !== 200) {
+        ret.err = errCode.APIDOUBANGETBOOKFAILED
+        ret.msg = 'Failed to get book from douban';
+        cb(ret.err, ret);
+        return;
+      }
+      var bookdata = '', bookdataObj = null;
+      res.on('data', function(chunk) {
+        bookdata += chunk;
+      });
+      res.on('end', function() {      
+        var save = function() {
+          bookmodel.addBookFromDouban(bookdataObj, function(err, data){
+            cb(err, data);
+          });
+        };
+      
+        bookdataObj = JSON.parse(bookdata);
+        bookdataObj.internalcat = bcat || 9;
+        bookdataObj.thumbnail = bookdataObj.images.small || bookdataObj.images.medium || bookdataObj.images.large;
+        if (bookdataObj.thumbnail) {
+          util.downloadImage(bookdataObj.thumbnail, function(err, ret) {
+            if (!err) {
+              bookdataObj.thumbnail = ret.image;
+            }
+            save();
+          });
+        } else {
+          save();
+        }
+      });
+      res.on('error', function() {
+        ret.err = errCode.APIBOOKFAILED;
+        ret.msg = 'Failed to parse book from douban';
+        cb(ret.err, ret);
+      });
+      res.read();
+    });
+    
+    client.on('error', function(e) {
+      console.log('get error from douban: ' + e.message);
+      ret.err = errCode.APIDOUBANGETBOOKFAILED;
+      ret.msg = e.message;
+      cb(ret.err, ret);
+    });
+
+};
+
 exports.test = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   util.downloadImage('http://img3.douban.com/spic/s27963383.jpg', function(err, ret) {
@@ -85,6 +140,7 @@ exports.getBookByISBN = function(req, res, next) {
         };
       
         bookdataObj = JSON.parse(bookdata);
+        bookdataObj.internalcat = 9;
         bookdataObj.thumbnail = bookdataObj.images.small || bookdataObj.images.medium || bookdataObj.images.large;
         if (bookdataObj.thumbnail) {
           util.downloadImage(bookdataObj.thumbnail, function(err, ret) {
@@ -147,12 +203,96 @@ exports.getBookByISBN = function(req, res, next) {
 
 exports.addBook = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
-  var ret = {err: errCode.NOTIMPLEMENT, msg: 'not implemented'};
-  res.end(JSON.stringify(ret));
+  var ret = {err: 0};
+  var isbn = req.params.isbn;
+  var barid = req.params.barid;
+  //var uid = req.params.uid;
+  var bcat = req.params.bcat || 9;
+  var sql;
+  console.log('addBook:'+isbn + '--'+barid + '--'+uid+'--'+bcat);
+  var afterBookAdded = function(bookDto) {
+    // add into DB `bar_shelf`
+    bookmodel.addBookToBarShelf(bookDto.bkid, barid, function(err, data) {
+      return res.end(JSON.stringify(data));
+    });
+  };
+  
+  bookmodel.getBookByIsbn(isbn, function(err, data) {
+    if (err && err !== errCode.DBBOOKNOTEXIST) return res.end(JSON.stringify(data));
+    
+    var bookDto = data.book;
+    if (bookDto) {
+      console.log('a book is found from DB');
+      afterBookAdded(bookDto);
+    } else {
+      downloadBookFromDouban(isbn, bcat, function(err, data2) {
+        if (err) return res.end(JSON.stringify(data2));
+        bookDto = data2.book;
+        afterBookAdded(bookDto);
+      });
+    }
+  });
+  
 };
 
 exports.exchangeBook = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
-  var ret = {err: errCode.NOTIMPLEMENT, msg: 'not implemented'};
-  res.end(JSON.stringify(ret));
+  var ret = {err: 0};
+  var barid = req.params.barid;
+  var bisbn = req.params.isbn;
+  var uid = req.params.uid;
+  var uisbn = req.params.uisbn;
+  var ubookcat = req.params.ubookcat || 9;
+  var sql;
+  var ts = util.now();
+
+  var afterBookAdded = function(bookDto) {
+    // add into DB `bar_shelf`
+    bookmodel.addBookToBarShelf(bookDto.bkid, barid, function(err, data) {
+      return res.end(JSON.stringify(data));
+    });
+  };
+  
+  var doExchange = function(bookid1, bookid2) {
+    bookmodel.removeBookFromBarShelf(bookid1, barid, function(err, data) {
+      if (err) return res.end(JSON.stringify(data));
+      bookmodel.addBookToBarShelf(bookid2, barid, function(err2, data2)) {
+        if (err) return res.end(JSON.stringify(data2));
+        ret.err = 0;
+        ret.msg = 'Succeed to exchange book';
+        return res.end(JSON.stringify(ret));
+      }
+    });
+  
+  };
+  
+  // TODO: get book from bar
+  bookmodel.getBookByIsbn(bisbn, function(err, data) {
+    if (err) return res.end(JSON.stringify(data));
+    var bookDto = data.book;
+    if (!bookDto) {
+      console.log('a book is found from DB');
+      ret.err = errCode.APIBOOKNOTFOUND;
+      ret.msg = 'The book is not found in the bar';
+      return res.end(JSON.stringify(ret));
+    }
+    // get user's book.
+    bookmodel.getBookByIsbn(uisbn, function(err2, data2) {
+      if (err2 && err2 !== errCode.DBBOOKNOTEXIST) return res.end(JSON.stringify(data2));    
+      var bookDtoByUser = data.book;
+      if (!bookDtoByUser) {
+        downloadBookFromDouban(uisbn, ubookcat, function(err3, data3) {
+          if (err3) return res.end(JSON.stringify(data3));
+          bookDtoByUser = data3.book;
+          if (!bookDtoByUser) {
+            ret.err = errCode.APIBOOKNOTFOUND;
+            ret.msg = 'The user book cannot be added to shelf';
+            return res.end(JSON.stringify(ret));
+          }
+          doExchange(bookDto.bkid, bookDtoByUser.bkid);
+        });
+      }
+    });
+  });
+  
 }
