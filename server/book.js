@@ -299,4 +299,47 @@ exports.exchangeBook = function(req, res, next) {
     });
   });
   
-}
+};
+
+exports.getBookByCategory = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var ret = {err: 0};
+  var books = [];
+  var cat = req.params.cat || 0;
+  var sql = 'select bkid, title, internalcat from book';
+  if (cat !== 0) {
+    sql += ' where internalcat="'+cat+'"';
+  }
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      res.end(JSON.stringify(data));
+    } else {
+      for (var i = 0, len = data.length; i < len; i++) {
+        books.push({bkid: data[i].bkid, title: data[i].title, cat: data[i].internalcat});
+      }
+      ret.books = books;
+      cb(JSON.stringify(ret));
+    }
+  });
+};
+
+exports.updateCategory = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var ret = {err: 0};
+  var bkid = req.body.bookid;
+  var cat = req.body.category;
+  if (!bkid || !cat) {
+    ret.err = APIPARAMSMISSING;
+    ret.msg = 'must input bookid and category';
+    return res.end(JSON.stringify(ret));
+  }
+  var sql = 'update book set internalcat="'+cat+'" where bkid="'+bkid+'"';
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      res.end(JSON.stringify(data));
+    } else {
+      ret.msg = 'Succeed';
+      cb(JSON.stringify(ret));
+    }
+  });
+};

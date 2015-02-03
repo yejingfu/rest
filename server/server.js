@@ -73,6 +73,12 @@ server.post('/book/add', book.addBook);
 // body: barid(int), bisbn(string), uid(int), uisbn(string), ubookcat(int)
 server.post('/book/exchange', book.exchangeBook);
 
+// Get all books by category: cat(int), if cat is not defined or zero, return all books.
+server.get('/book/category/:cat', book.getBookByCategory);
+
+// update book category: bookid(int), category(int)
+server.post('/book/category', book.updateCategory);
+
 // get bar information by id
 server.get('/bar/id/:id', bar.getBarById);
 // get all bars inside of the district
