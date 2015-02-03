@@ -35,6 +35,18 @@ app.use('/users', users);
 app.use('/book', book);
 app.use('/bar', bar);
 
+app.get('/book/category/:cat', function(req, res){
+  var cat = req.params.cat || 0;
+  var client = http.get('http://121.199.58.239:3011/book/category/'+cat, function(res2){
+    res2.pipe(res);
+  });
+  client.on('error', function(e) {
+    var ret = {err: 1, msg:'Failed to get books: ' + e};
+    res.setHeader('Content-Type', 'text/json');
+    res.end(JSON.stringify(ret));
+  });
+});
+
 bar.setApp(app);
 
 app.use(function(req, res, next) {

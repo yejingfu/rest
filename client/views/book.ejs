@@ -3,10 +3,55 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/javascripts/jquery-2.0.3.min.js"></script>
   </head>
   <body>
-    <h1>Add Book</h1>
     <p>Welcome to <%= title %></p>
+    <hr>
+    <table id="tb_booklist" border="1" cellpadding="4" style="border: 1px solid; text-align:center;" width="600px">
+      <tr>
+        <th width="50px">id</th>
+        <th width="300px">book name</th>
+        <th width="150px">book category </th>
+        <th width="100px">update</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>name 1</td>
+        <td>
+          <select>
+            <option value='1'>文学</option>
+            <option value='2'>哲学</option>
+            <option value='3'>计算机</option>
+          </select>
+        </td>
+        <td>
+          <input id="update_1" type="button" value="update"/>
+        </td>
+      </tr>
+    </table>
+    
+<script>
+  $(document).ready(function() {
+    $.ajax({
+      type: 'GET',
+      url: '/book/category/0',
+      success: function(data) {
+        alert(data);
+      },
+      error: function(req, txt, err) {
+        console.error('Failed to get books from server:/book/category/0');
+      }
+      
+    });
+  
+  
+     $('#update_1').click(function(){
+       $('#update_1').attr('disabled', true);
+     });
+  });
+</script>
+    
   </body>
 </html>
 
