@@ -305,10 +305,12 @@ exports.getBookByCategory = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var ret = {err: 0};
   var books = [];
-  var cat = req.params.cat || 0;
+  var cat = req.params.cat || -1;
   var sql = 'select bkid, title, internalcat from book';
-  if (cat !== 0) {
+  if (cat > 0) {
     sql += ' where internalcat="'+cat+'"';
+  } else {
+    sql += ' where internalcat in(0, 9)';
   }
   util.exeDBQuery(pool, sql, function(err, data) {
     if (err) {
@@ -318,7 +320,7 @@ exports.getBookByCategory = function(req, res, next) {
         books.push({bkid: data[i].bkid, title: data[i].title, cat: data[i].internalcat});
       }
       ret.books = books;
-      cb(JSON.stringify(ret));
+      return res.end(JSON.stringify(ret));
     }
   });
 };

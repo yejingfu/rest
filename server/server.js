@@ -73,7 +73,7 @@ server.post('/book/add', book.addBook);
 // body: barid(int), bisbn(string), uid(int), uisbn(string), ubookcat(int)
 server.post('/book/exchange', book.exchangeBook);
 
-// Get all books by category: cat(int), if cat is not defined or zero, return all books.
+// Get all books by category: cat(int), if cat is a nagetive, return all books.
 server.get('/book/category/:cat', book.getBookByCategory);
 
 // update book category: bookid(int), category(int)
