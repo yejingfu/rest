@@ -341,7 +341,7 @@ exports.updateCategory = function(req, res, next) {
       res.end(JSON.stringify(data));
     } else {
       ret.msg = 'Succeed';
-      cb(JSON.stringify(ret));
+      return res.end(JSON.stringify(ret));
     }
   });
 };
