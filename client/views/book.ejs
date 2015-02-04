@@ -35,6 +35,7 @@
 
   var renderBooks = function(books) {
     var book, html, selection;
+    if (!books) return;
     for (var i = 0, len = books.length; i < len; i++) {
       book = books[i];
       //console.log('book:'+book.bkid + '--'+book.title + '--'+book.cat);

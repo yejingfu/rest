@@ -56,7 +56,7 @@ app.post('/book/category', function(req, res) {
   res.setHeader('Content-Type', 'text/json');
   
   var options = {
-    hostname: 'localhost',    //'121.199.58.239', // 
+    hostname: 'localhost',    //'121.199.58.239',
     port: 3011,
     path: '/book/category2',
     method: 'POST'

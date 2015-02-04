@@ -380,24 +380,4 @@ exports.updateCategory2 = function(req, res, next) {
     res.end(JSON.stringify(ret));
   });
   req.read();
-
-
-  res.setHeader('Content-Type', 'text/json');
-  var ret = {err: 0};
-  var bkid = req.body.bookid;
-  var cat = req.body.category;
-  if (!bkid || !cat) {
-    ret.err = APIPARAMSMISSING;
-    ret.msg = 'must input bookid and category';
-    return res.end(JSON.stringify(ret));
-  }
-  var sql = 'update book set internalcat="'+cat+'" where bkid="'+bkid+'"';
-  util.exeDBQuery(pool, sql, function(err, data) {
-    if (err) {
-      res.end(JSON.stringify(data));
-    } else {
-      ret.msg = 'Succeed';
-      return res.end(JSON.stringify(ret));
-    }
-  });
 };
