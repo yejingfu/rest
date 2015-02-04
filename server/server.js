@@ -78,6 +78,7 @@ server.get('/book/category/:cat', book.getBookByCategory);
 
 // update book category: bookid(int), category(int)
 server.post('/book/category', book.updateCategory);
+server.post('/book/category2', book.updateCategory2); // used for client only
 
 // get bar information by id
 server.get('/bar/id/:id', bar.getBarById);

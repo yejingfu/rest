@@ -58,7 +58,7 @@ app.post('/book/category', function(req, res) {
   var options = {
     hostname: 'localhost',    //'121.199.58.239', // 
     port: 3011,
-    path: '/book/category',
+    path: '/book/category2',
     method: 'POST'
   };
   var client = http.request(options, function(res2) {
