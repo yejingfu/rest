@@ -306,10 +306,12 @@ exports.getBookByCategory = function(req, res, next) {
   var ret = {err: 0};
   var books = [];
   var cat = req.params.cat || -1;
+  if (isNaN(cat))
+    cat = -1;
   var sql = 'select bkid, title, internalcat from book';
   if (cat > 0) {
     sql += ' where internalcat="'+cat+'"';
-  } else {
+  } else if (cat === 0) {
     sql += ' where internalcat in(0, 9)';
   }
   util.exeDBQuery(pool, sql, function(err, data) {
