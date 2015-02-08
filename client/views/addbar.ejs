@@ -10,8 +10,8 @@
       function mapInit(){
         mapObj = new AMap.Map("iCenter");
         var clickEventListener=AMap.event.addListener(mapObj,'click',function(e){
-		  document.getElementById("barLat").value=e.lnglat.getLng();
-		  document.getElementById("barLong").value=e.lnglat.getLat();  
+		  document.getElementById("barLat").value=e.lnglat.getLat();
+		  document.getElementById("barLong").value=e.lnglat.getLng();
         });
       }
   </script>
