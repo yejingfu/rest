@@ -306,10 +306,12 @@ exports.getBookByCategory = function(req, res, next) {
   var ret = {err: 0};
   var books = [];
   var cat = req.params.cat || -1;
+  if (isNaN(cat))
+    cat = -1;
   var sql = 'select bkid, title, internalcat from book';
   if (cat > 0) {
     sql += ' where internalcat="'+cat+'"';
-  } else {
+  } else if (cat === 0) {
     sql += ' where internalcat in(0, 9)';
   }
   util.exeDBQuery(pool, sql, function(err, data) {
@@ -344,4 +346,40 @@ exports.updateCategory = function(req, res, next) {
       return res.end(JSON.stringify(ret));
     }
   });
+};
+
+exports.updateCategory2 = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var data = '', ret = {}, obj;
+  
+  var updateBookCat = function(bkid, cat) {
+    if (!bkid || !cat) {
+      ret.err = APIPARAMSMISSING;
+      ret.msg = 'must input bookid and category';
+      return res.end(JSON.stringify(ret));
+    }
+    var sql = 'update book set internalcat="'+cat+'" where bkid="'+bkid+'"';
+    util.exeDBQuery(pool, sql, function(err, data) {
+      if (err) {
+        res.end(JSON.stringify(data));
+      } else {
+        ret.msg = 'Succeed';
+        return res.end(JSON.stringify(ret));
+      }
+    });
+  };  
+
+  req.on('data', function(chunk) {
+    data += chunk;
+  });
+  req.on('end', function() {
+    obj = JSON.parse(data);
+    updateBookCat(obj.bookid, obj.category);
+  });
+  req.on('error', function(e) {
+    ret.err = errCode.APIBOOKFAILED;
+    ret.msg = 'Failed to read request from client';
+    res.end(JSON.stringify(ret));
+  });
+  req.read();
 };

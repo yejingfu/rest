@@ -15,29 +15,72 @@
         <th width="150px">book category </th>
         <th width="100px">update</th>
       </tr>
-      <tr>
-        <td>1</td>
-        <td>name 1</td>
-        <td>
-          <select>
-            <option value='1'>文学</option>
-            <option value='2'>哲学</option>
-            <option value='3'>计算机</option>
-          </select>
-        </td>
-        <td>
-          <input id="update_1" type="button" value="update"/>
-        </td>
-      </tr>
     </table>
     
 <script>
+  var catOptions = ['未分类', '文学', '美食与旅游', '考试', '应用', '经济', '计算机', '儿童', '生活', '其他'];
+  var generateSelectCtl = function(bkid, selectedOption) {
+    var selectCtrl = '<select id="cat_'+bkid+'">';
+    for (var i = 0; i < 10; i++) {
+      selectCtrl += '<option value="'+i+'"';
+      if (i === selectedOption) {
+        selectCtrl += ' selected';
+      }
+      selectCtrl += '>' + catOptions[i] + '</option>';
+    }
+    selectCtrl += '</select>';
+    
+    return selectCtrl;
+  };
+
+  var renderBooks = function(books) {
+    var book, html, selection;
+    if (!books) return;
+    for (var i = 0, len = books.length; i < len; i++) {
+      book = books[i];
+      //console.log('book:'+book.bkid + '--'+book.title + '--'+book.cat);
+      selection = generateSelectCtl(book.bkid, book.cat);
+      //console.log(selection);
+      html = '<tr><td>'+book.bkid+'</td><td>'+book.title+'</td><td>'+selection+'</td><td><input id="btnUpdate_'+book.bkid+'" type="button" value="update" /></td></tr>';
+      $('#tb_booklist').append(html);
+      (function(bkid){
+        $('#btnUpdate_'+bkid).click(function(){
+          $(this).attr('disabled', true);
+          console.log('update:'+bkid + '--' + $('#cat_'+bkid).val());
+          updateBookCategory(bkid, $('#cat_'+bkid).val());
+        });
+      })(book.bkid);
+    }
+  };
+  
+  var updateBookCategory = function(bkid, cat) {
+    $.ajax({
+      type: 'POST',
+      url: '/book/category',
+      data: {
+        bookid: bkid,
+        category: cat
+      },
+      dataType: 'json',
+      success: function(data) {
+        if (data.err)
+          console.error('Failed to update book category: '+data.msg);
+        else
+          console.log('Succeed to update');
+      },
+      error: function(req, txt, err) {
+        console.error('Failed to get books from server:/book/category/0');
+      }
+    });
+  };
+ 
   $(document).ready(function() {
     $.ajax({
       type: 'GET',
       url: '/book/category/0',
+      dataType: 'json',
       success: function(data) {
-        alert(data);
+        renderBooks(data.books);
       },
       error: function(req, txt, err) {
         console.error('Failed to get books from server:/book/category/0');

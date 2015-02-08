@@ -47,6 +47,40 @@ app.get('/book/category/:cat', function(req, res){
   });
 });
 
+app.post('/book/category', function(req, res) {
+  var bkid = req.body.bookid;
+  var cat = req.body.category;
+  var reqObj = {bookid: bkid, category: cat};
+  console.log('update book category: ' + bkid + '--'+ cat);
+  var ret = {err: 0, msg:'Success'};
+  res.setHeader('Content-Type', 'text/json');
+  
+  var options = {
+    hostname: 'localhost',    //'121.199.58.239',
+    port: 3011,
+    path: '/book/category2',
+    method: 'POST'
+  };
+  var client = http.request(options, function(res2) {
+    console.log('res status: ' + res2.statusCode);
+    if (res2.statusCode === 200) {
+      res.end(JSON.stringify(ret));
+    } else {
+      console.log('HEADERS: ' + JSON.stringify(res2.headers));
+      ret.err = 2;
+      ret.msg = 'failed to connect to server: ' + res2.statusCode;
+      res.end(JSON.stringify(ret));
+    }
+  });
+  client.on('error', function(e) {
+    ret.err = 1;
+    ret.msg = 'error: ' + e;
+    res.end(JSON.stringify(ret));
+  });
+  client.write(JSON.stringify(reqObj));
+  client.end();
+});
+
 bar.setApp(app);
 
 app.use(function(req, res, next) {
