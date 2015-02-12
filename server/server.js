@@ -98,6 +98,7 @@ server.get('/bar/books', bar.getAllBooks);
 server.get('/districts', util.getAllDistricts);
 
 server.get('/image/:name', util.getImageStreamByName);
+server.post('/image', util.postImage);
 
 server.listen(3011, function() {
   console.log('%s listening at %s', server.name, server.url);

@@ -111,6 +111,38 @@ exports.getImageStreamByName = function(req, res, next) {
   });
 };
 
+var saveBase64Image = function(body, cb) {
+  var ret = {err: 0};
+  var data = body.data;
+  var ext = body.ext;
+  var encode = body.encode;
+  if (encode !== 'base64') {
+    return cb({err: 1, msg: 'The data should be base64 encoded'});
+  }
+  var header = data.substring(0, 25);
+  var idx  = header.indexOf('base64,');
+  if (idx >= 0) {
+    data = data.substring(idx + 7);
+  }
+  var imageName = uuid.v4() + '.' + ext || 'png';
+  var imagePath = path.join(exports.imgFolder, imageName);
+  fs.writeFile(imagePath, data, 'base64', function(err) {
+    if (err) {
+      cb({err: 3, msg: 'Failed to save image to disk'});
+    } else {
+      ret.name = imageName;
+      return cb(ret);
+    }
+  });
+};
+
+exports.postImage = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  saveBase64Image(req.body, function(ret) {
+    res.end(JSON.stringify(ret));
+  });
+};
+
 exports.getAllDistricts = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var sql = 'select * from district';
