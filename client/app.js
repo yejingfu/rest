@@ -25,8 +25,8 @@ app.set('imagepath', '/opt/booker/storage');
 
 app.use(logger('dev'));
 // The bodyParser cannot parse file in form. Instead use multiparty for parse file fields.
-app.use(bodyParser.json());  // parse post body as json format
-app.use(bodyParser.urlencoded({ extended: true }));  // parse "application/x-www-form-urlencoded"
+app.use(bodyParser.json({limit: '10mb'}));  // parse post body as json format
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));  // parse "application/x-www-form-urlencoded"
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -34,6 +34,7 @@ app.use('/', routes);
 app.use('/users', users);
 app.use('/book', book);
 app.use('/bar', bar);
+app.use('/uploadimage', routes.uploadimage);
 
 app.get('/book/category/:cat', function(req, res){
   var cat = req.params.cat || 0;

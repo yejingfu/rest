@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/javascripts/jquery-2.0.3.min.js"></script>
+  </head>
+  <body>
+    <p>Welcome to <%= title %></p>
+    <hr>
+    <p> File to upload: <input id='file_image' type='file', name='image'/> </p>
+    <p><input id='btnUpload' type='button' value='upload'/></p>
+
+<hr>
+<pre>
+    $.ajax({
+      type: 'POST',
+      url: '/uploadimage',
+      data: {
+        encode: 'base64',
+        ext: 'jpg',
+        data: content 
+      },
+      dataType: 'json',
+      success: function(data) {
+        if (data.err)
+          console.error('Failed to upload image: '+data.msg);
+        else
+          console.log('Succeed to upload image: ' + data.name);
+      },
+      error: function(req, txt, err) {
+        console.error('Failed to upload image');
+      }
+    });
+</pre>
+    
+<script>
+  
+  var updateImageData = function(content) {
+    $.ajax({
+      type: 'POST',
+      url: '/uploadimage',
+      data: {
+        encode: 'base64',
+        ext: 'jpg',
+        data: content 
+      },
+      dataType: 'json',
+      success: function(data) {
+        if (data.err)
+          console.error('Failed to upload image: '+data.msg);
+        else
+          console.log('Succeed to upload image: ' + data.name);
+      },
+      error: function(req, txt, err) {
+        console.error('Failed to upload image');
+      }
+    });
+  };
+ 
+  $(document).ready(function() {
+    $('#btnUpload').click(function(){
+        var file = $('#file_image')[0];
+        var blob;
+        if (!file || file.files.length !== 1) {
+          alert('No file is selected!');
+          return;
+        }
+        blob = file.files[0];
+        var reader = new FileReader();
+        var content;
+        //reader.readAsText(blob, 'UTF-8');
+        //reader.readAsArrayBuffer(blob);
+        reader.readAsDataURL(blob);
+        reader.onprogress = function(e) {
+            console.log('onprogress: ' + e.loaded + '/' + e.total);
+        };
+        reader.onload = function(e) {
+            content = e.target.result;
+            //console.log('onload: ' + content);
+            updateImageData(content);
+        };
+        reader.onerror = function(e) {
+          console.error('Failed to read file: ' + e.target.error);
+        };
+    });
+  });
+</script>
+    
+  </body>
+</html>
+
+
