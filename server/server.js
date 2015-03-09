@@ -41,6 +41,10 @@ server.get('/md5/:digest', function(req, res, next) {
   next();
 });
 
+server.post('/test', function(req, res, next) {
+  res.end('post /test done!');
+});
+
 server.get('/hello/:name', hello_handler);
 server.head('/hello/:name', hello_handler);
 
