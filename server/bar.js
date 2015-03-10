@@ -55,14 +55,15 @@ exports.getAllBarIds = function(req, res, next) {
 exports.addBar = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var obj = {};
-  obj.bname = req.body.bname;
-  obj.tel = req.body.tel;
-  obj.address = req.body.address;
-  obj.latitude = req.body.latitude;
-  obj.longitude = req.body.longitude;
-  obj.district = req.body.district;
-  obj.rank = req.body.rank;
-  obj.photoes = req.body.photoes;
+  obj.bname = req.body.bname || '';
+  obj.tel = req.body.tel || '';
+  obj.address = req.body.address || '';
+  obj.desc = req.body.desc || '';
+  obj.latitude = req.body.latitude || 0;
+  obj.longitude = req.body.longitude || 0;
+  obj.district = req.body.district || '';
+  obj.rank = req.body.rank || 0;
+  obj.photoes = req.body.photoes || '';
   
   barmodel.addBar(obj, function(err, data) {
     if (err) console.log('Failed to add bar into DB');
