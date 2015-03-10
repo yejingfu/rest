@@ -101,7 +101,7 @@ router.post('/add', function(req, res) {
       barObj.bname = fields['barName'][0];
       barObj.tel = fields['barTel'][0];
       barObj.address = fields['barAddress'][0];
-      barObj.desc = fields['barDesc'][0];
+      barObj.descr = fields['barDesc'][0];
       barObj.latitude = fields['barLat'][0];
       barObj.longitude = fields['barLong'][0];
       barObj.district = fields['barDistrict'][0];

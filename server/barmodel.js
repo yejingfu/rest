@@ -10,7 +10,7 @@ var BarDTO = function() {
   this.bname = '';
   this.tel = '';
   this.address = '';
-  this.desc = '';
+  this.descr = '';  // desc is key word in DB
   this.latitude = '';
   this.longitude = '';
   this.district = 0;
@@ -27,7 +27,7 @@ BarDTO.prototype = {
       bname: this.bname,
       tel: this.tel,
       address: this.address,
-      desc: this.desc,
+      descr: this.descr,
       latitude: this.latitude,
       longitude: this.longitude,
       district: this.district,
@@ -41,7 +41,7 @@ BarDTO.prototype = {
     this.bname = obj.bname || '';
     this.tel = obj.tel || '';
     this.address = obj.address || '';
-    this.desc = obj.desc || '';
+    this.descr = obj.descr || '';
     this.latitude = obj.latitude || '';
     this.longitude = obj.longitude || '';
     this.district = obj.district || 0;
@@ -169,8 +169,8 @@ var extractBarDTOFromDB = function(rows) {
 var saveToDB = function(dto, cb) {
   var ts = util.now();
   var ret = {};
-  var sql = 'insert into bar(bname, tel, address, desc, latitude, longitude, district, rank, photoes, createdts, updatedts) values("'+
-  dto.bname+'","'+dto.tel+'","'+dto.address+'","'+dto.desc+'","'+dto.latitude+'","'+dto.longitude+'","'+dto.district+'","'+dto.rank+'","'+dto.photoes+'","'+ts+'","'+ts+'")';
+  var sql = 'insert into bar(bname, tel, address, descr, latitude, longitude, district, rank, photoes, createdts, updatedts) values("'+
+  dto.bname+'","'+dto.tel+'","'+dto.address+'","'+dto.descr+'","'+dto.latitude+'","'+dto.longitude+'","'+dto.district+'","'+dto.rank+'","'+dto.photoes+'","'+ts+'","'+ts+'")';
   util.exeDBQuery(pool, sql, function(err, data) {
     if (err) {
       ret.err = errCode.DBFAILEDADDBAR;

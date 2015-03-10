@@ -58,7 +58,7 @@ exports.addBar = function(req, res, next) {
   obj.bname = req.body.bname || '';
   obj.tel = req.body.tel || '';
   obj.address = req.body.address || '';
-  obj.desc = req.body.desc || '';
+  obj.descr = req.body.descr || '';
   obj.latitude = req.body.latitude || 0;
   obj.longitude = req.body.longitude || 0;
   obj.district = req.body.district || '';
@@ -83,7 +83,7 @@ exports.addBar2 = function(req, res, next) {
     obj = JSON.parse(data);
     barmodel.addBar(obj, function(err, data2) {
       if (err) {
-        console.log('Failed to add bar into DB');
+        console.log('Failed to add bar into DB: ' + err.msg);
       } else {
         console.log('Succeed to add bar into DB');
         res.end(JSON.stringify(data2));
