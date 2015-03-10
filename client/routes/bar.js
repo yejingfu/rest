@@ -81,6 +81,7 @@ router.post('/add', function(req, res) {
     */
     console.log('bar: ' + fields['barName']+'--'+fields['barTel'] + '--' + fields['barAddress']+ '--' + fields['barDistrict']);
     console.log('latitude:' + fields['barLat'] + ', longitude:' + fields['barLong']);
+    console.log('bar description:'+fields['barDesc']);
     var images = files['barPhoto'];
     if (!images || images.length === 0) {
       res.end('Failed to upload image: no image received');
@@ -100,6 +101,7 @@ router.post('/add', function(req, res) {
       barObj.bname = fields['barName'][0];
       barObj.tel = fields['barTel'][0];
       barObj.address = fields['barAddress'][0];
+      barObj.desc = fields['barDesc'][0];
       barObj.latitude = fields['barLat'][0];
       barObj.longitude = fields['barLong'][0];
       barObj.district = fields['barDistrict'][0];
