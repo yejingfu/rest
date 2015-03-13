@@ -99,6 +99,28 @@ server.post('/bar2', bar.addBar2);
 // get all books from bar, inputs: `barid` and `bookcat`
 server.get('/bar/books', bar.getAllBooks);
 
+// Get user id list who like this bar
+// input: id(bar id)
+// ouput: array of user id
+server.get('/bar/likes/:id', bar.getAllLikes);
+// Call it if some user like this bar
+// input: barid(bar id), userid(user id)
+// output: error code 
+server.post('/bar/like', bar.likeBar);
+// Call it if some user dislike this bar
+// input barid(bar id), userid(user id)
+// output: error code
+server.post('/bar/dislike', bar.dislikeBar);
+// Get user id list who recently come in this bar
+// input: id(bar id)
+// output: array of pair (userID, timestamp), example:
+// [userId1, ts1, userId2, ts2, userId3, ts3, ...]
+server.get('/bar/customers/:id', bar.getAllCustomers);
+// Call it if some user comes into this bar
+// input: barid(bar id), userid(user id)
+// output: error code
+server.post('/bar/enter', bar.enter);
+
 server.get('/districts', util.getAllDistricts);
 
 server.get('/image/:name', util.getImageStreamByName);

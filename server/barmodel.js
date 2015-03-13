@@ -190,8 +190,106 @@ var addBar = function(obj, cb) {
   saveToDB(dto, cb);
 };
 
+var likeBar = function(barId, userId, cb) {
+  var sql = 'insert into user_like_bar(uid, bid, createdts) values("'+
+    userId+'", "'+barId+'", "'+util.now()+'")';
+  var ret = {};
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      ret.err = errCode.DBBARLIKE;
+      ret.msg = 'Failed to add record into DB: ' + data.msg;
+      cb(ret.err, ret);
+    } else {
+      ret.err = 0;
+      ret.msg = 'Success: ' + userId + ' like ' + barId;
+      cb(ret.err, ret);
+    }
+  });
+};
+
+var dislikeBar = function(barId, userId, cb) {
+  var sql = 'delete from user_like_bar where uid="'+userId+'" and bid="'+barId+'"';
+  var ret = {};
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      ret.err = errCode.DBBARLIKE;
+      ret.msg = 'Failed to delete record from DB: ' + data.msg;
+      cb(ret.err, ret);
+    } else {
+      ret.err = 0;
+      ret.msg = 'Success: ' + userId + ' dislike ' + barId;
+      cb(ret.err, ret);
+    }
+  });
+};
+
+var getLikeList = function(barId, cb) {
+  var sql = 'select uid from user_like_bar where bid="'+barId+'" order by createdts limit 10000';
+  var ret = {};
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      ret.err = errCode.DBBARGETLIKES;
+      ret.msg = 'Failed to get bar likes from DB: ' + data.msg;
+      cb(ret.err, ret);
+    } else {
+      ret.err = 0;
+      var rows = data;
+      var ids = [];
+      for (var i = 0, len = rows.length; i < len; i++) {
+        ids.push(rows[i].uid);
+      }
+      ret.uids = ids;
+      cb(ret.err, ret);
+    }
+  });
+};
+
+var enterBar = function(barId, userId, cb) {
+  var ts = util.now();
+  var sql = 'insert into user_enter_bar(uid, bid, createdts) values("'+
+    userId+'", "'+barId+'", "'+ts+'")';
+  var ret = {};
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      ret.err = errCode.DBBARENTER;
+      ret.msg = 'Failed to add record into DB: ' + data.msg;
+      cb(ret.err, ret);
+    } else {
+      ret.err = 0;
+      ret.msg = 'Success: ' + userId + ' comes into ' + barId + ' at ' + ts;
+      cb(ret.err, ret);
+    }
+  });
+};
+
+var getCustomerList = function(barId, cb) {
+  var sql = 'select uid, createdts from user_enter_bar where bid="'+barId+'" order by createdts desc limit 500';
+  var ret = {};
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      ret.err = errCode.DBBARGETCUSTOMERS;
+      ret.msg = 'Failed to get bar recent customers from DB: ' + data.msg;
+      cb(ret.err, ret);
+    } else {
+      ret.err = 0;
+      var rows = data;
+      var ids = [];
+      for (var i = 0, len = rows.length; i < len; i++) {
+        ids.push(rows[i].uid, rows[i].createdts);
+      }
+      ret.uids = ids;
+      cb(ret.err, ret);
+    }
+  });
+};
+
 exports.addBar = addBar;
 exports.getAllBars = getAllBars;
 exports.getAllBarIds = getAllBarIds;
 exports.getBarById = getBarById;
 exports.getBarByDistrictId = getBarByDistrictId;
+exports.likeBar = likeBar;
+exports.dislikeBar = dislikeBar;
+exports.getLikeList = getLikeList;
+exports.enterBar = enterBar;
+exports.getCustomerList = getCustomerList;

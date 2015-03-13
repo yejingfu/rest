@@ -121,6 +121,55 @@ exports.getAllBooks = function(req, res, next) {
       return res.end(JSON.stringify(ret));
     });
   });
-
 };
+
+exports.getAllLikes = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var barid = req.params.id;
+  barmodel.getLikeList(barid, function(err, data) {
+    if (err) console.log('Failed in getAllLikes');
+    res.end(JSON.stringify(data));
+  });
+};
+
+exports.likeBar = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var barid = req.params.barid;
+  var userid = req.params.userid;
+  barmodel.likeBar(barid, userid, function(err, data) {
+    if (err) console.log('Failed in likeBar');
+    res.end(JSON.stringify(data));
+  });
+};
+
+exports.dislikeBar = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var barid = req.params.barid;
+  var userid = req.params.userid;
+  barmodel.dislikeBar(barid, userid, function(err, data) {
+    if (err) console.log('Failed in dislikeBar');
+    res.end(JSON.stringify(data));
+  });
+};
+
+exports.getAllCustomers = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var barid = req.params.id;
+  barmodel.getCustomerList(barid, function(err, data) {
+    if (err) console.log('Failed in getAllCustomers');
+    res.end(JSON.stringify(data));
+  });
+};
+
+exports.enter = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var barid = req.params.barid;
+  var userid = req.params.userid;
+  barmodel.enterBar(barid, userid, function(err, data) {
+    if (err) console.log('Failed in enter');
+    res.end(JSON.stringify(data));
+  });
+};
+
+
 
