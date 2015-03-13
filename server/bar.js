@@ -20,13 +20,35 @@ exports.getBarById = function(req, res, next) {
   });
 };
 
+var getBarLikes = function(bars, cb) {
+  var len = bars.length;
+  var i, j = 0;
+  for (i = 0; i < len; i ++) {
+    (function(idx){
+    barmodel.getLikeList(bars[idx].bid, function(err, data) {
+      if (err) {
+        bars[idx].likes = [];
+      } else {
+        bars[idx].likes = data.uids;
+      }
+      j++;
+      if (j === len) {
+        cb();
+      }
+    });
+    })(i);
+  }
+}
+
 exports.getBarByDistrictId = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var districtId = req.params.districtid;
   barmodel.getBarByDistrictId(districtId, function(err, data) {
     if (err) console.log('Failed to get bar by district id');
     if (data && data.bars) {
-      res.end(JSON.stringify(data));
+      getBarLikes(data.bars, function(){
+        res.end(JSON.stringify(data));
+      });
     } else {
       var ret = {err: errCode.APIBARFAILED, msg: 'Failed to get bar'};
       res.end(JSON.stringify(ret));
@@ -39,7 +61,13 @@ exports.getAllBars = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   barmodel.getAllBars(function(err, data) {
     if (err) console.log('Failed to get all bar');
-    res.end(JSON.stringify(data));
+    if (data && data.bars) {
+      getBarLikes(data.bars, function() {
+        res.end(JSON.stringify(data));
+      });
+    } else {
+      res.end(JSON.stringify(data));
+    }
   });
 };
 

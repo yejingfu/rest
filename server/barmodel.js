@@ -18,6 +18,7 @@ var BarDTO = function() {
   this.photoes = '';
   this.createdts = 0;
   this.updatedts = 0;
+  this.likes = [];
 };
 
 BarDTO.prototype = {
@@ -32,7 +33,8 @@ BarDTO.prototype = {
       longitude: this.longitude,
       district: this.district,
       rank: this.rank,
-      photoes: this.photoes
+      photoes: this.photoes,
+      likes: this.likes
     };
   },
   
@@ -49,6 +51,7 @@ BarDTO.prototype = {
     this.photoes = obj.photoes || '';
     this.createdts = obj.createdts || 0;
     this.updatedts = obj.updatedts || 0;
+    this.likes = [];
   }
 };
 
