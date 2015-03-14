@@ -273,6 +273,7 @@ var getCustomerList = function(barId, keepDup, cb) {
   var key, i, len;
   var rows, row;
   var ids = [];
+  var count = 0;
   util.exeDBQuery(pool, sql, function(err, data) {
     if (err) {
       ret.err = errCode.DBBARGETCUSTOMERS;
@@ -284,7 +285,7 @@ var getCustomerList = function(barId, keepDup, cb) {
       for (i = 0, len = rows.length; i < len; i++) {
         row = rows[i];
         if (!keepDup) {
-          if (!idmap[row.uid]) {
+          if (idmap[row.uid] === undefined) {
             idmap[row.uid] = row.createdts;
             ids.push(row.uid, row.createdts);
           }
@@ -301,13 +302,15 @@ var getCustomerList = function(barId, keepDup, cb) {
         ids = Object.keys(idmap);
         len = ids.length;
         ret.uids = [];
+        count = 0;
         for (i = 0; i < len; i++) {
           (function(idx) {
             um.getUserBasicInfoByUID(ids[idx], function(err2, data2) {
+              count++;
               if (!err2) {
                 ret.uids.push([data2.uid, data2.phone, data2.status, data2.nickname, data2.gender, data2.avatar, idmap[ids[idx]]]);
               }
-              if (idx === len - 1) {
+              if (count === len - 1) {
                 cb(0, ret);
               }
             });
