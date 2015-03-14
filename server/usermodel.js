@@ -207,6 +207,32 @@ exports.getUserByPhone = function(phone, cb) {
   });
 };
 
+exports.getUserByUID = function(uid, cb) {
+  var sql = 'select * from user where uid='+uid+' limit 1';
+  var dto;
+  var ret = {err: 0};
+  if (typeof cb !== 'function') {
+    return;
+  }
+  
+  exeQuery(sql, function(err, data) {
+    if (err) {
+      cb(err, data);
+    } else {
+      dto = extractUserDTOFromDB(data);
+      if (dto.length === 0) {
+        ret = {err: errCode.DBUSERNOTEXIST, msg: 'user not exists!'};
+      } else if (dto.length > 1) {
+        ret = {err: errCode.DBUSERDUP, msg: 'duplicated users!'};
+      } else {
+        //console.log('ddd:'+JSON.stringify(dto[0].toJSON()));
+        ret.user = dto[0].toJSON();
+      }
+      cb(ret.err, ret);
+    }
+  });
+};
+
 exports.getProfileByUID = function(uid, cb) {
   var sql = 'select * from user_profile where uid='+uid+' limit 1';
   var profile;
@@ -228,6 +254,23 @@ exports.getProfileByUID = function(uid, cb) {
       }
       cb(ret.err, ret);
     }
+  });
+};
+
+exports.getUserBasicInfoByUID = function(uid, cb) {
+  var basicInfo = {};
+  exports.getUserByUID(uid, function(err, data) {
+    if (err) return cb(err, data);
+    exports.getProfileByUID(uid, function(err2, data2) {
+      if (err2) return cb(err2, data2);
+      basicInfo.uid = data.user.uid;
+      basicInfo.phone = data.user.phone;
+      basicInfo.status = data.user.status;
+      basicInfo.nickname = data2.profile.nickname;
+      basicInfo.gender = data2.profile.gender;
+      basicInfo.avatar = data2.profile.avatar;
+      cb(0, basicInfo);
+    });
   });
 };
 

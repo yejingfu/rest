@@ -2,6 +2,7 @@
 var util = require('./util');
 var error = require('./error');
 var errCode = error.errCode;
+var um = require('./usermodel');
 
 var pool = util.dbPool;
 
@@ -269,6 +270,9 @@ var getCustomerList = function(barId, keepDup, cb) {
   var sql = 'select uid, createdts from user_enter_bar where bid="'+barId+'" order by createdts desc limit 500';
   var ret = {};
   var idmap = {};
+  var key, i, len;
+  var rows, row;
+  var ids = [];
   util.exeDBQuery(pool, sql, function(err, data) {
     if (err) {
       ret.err = errCode.DBBARGETCUSTOMERS;
@@ -276,22 +280,40 @@ var getCustomerList = function(barId, keepDup, cb) {
       cb(ret.err, ret);
     } else {
       ret.err = 0;
-      var rows = data;
-      var row;
-      var ids = [];
-      for (var i = 0, len = rows.length; i < len; i++) {
+      rows = data;
+      for (i = 0, len = rows.length; i < len; i++) {
         row = rows[i];
         if (!keepDup) {
           if (!idmap[row.uid]) {
-            idmap[row.uid] = true;
+            idmap[row.uid] = row.createdts;
             ids.push(row.uid, row.createdts);
           }
         } else {
           ids.push(row.uid, row.createdts);
         }
       }
-      ret.uids = ids;
-      cb(ret.err, ret);
+      if (keepDup) {
+        ret.uids = ids;
+        cb(ret.err, ret);
+      } else {
+        // ids would be include user basic info, like blow:
+        //[['id1', 'phone', 'nickname', 'avatar', 'createdts'], [...]]
+        ids = Object.keys(idmap);
+        len = ids.length;
+        ret.uids = [];
+        for (i = 0; i < len; i++) {
+          (function(idx) {
+            um.getUserBasicInfoByUID(ids[idx], function(err2, data2) {
+              if (!err2) {
+                ret.uids.push([data2.uid, data2.phone, data2.status, data2.nickname, data2.gender, data2.avatar, idmap[ids[idx]]]);
+              }
+              if (idx === len - 1) {
+                cb(0, ret);
+              }
+            });
+          })(i);
+        }
+      }
     }
   });
 };
