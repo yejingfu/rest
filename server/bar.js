@@ -183,7 +183,7 @@ exports.dislikeBar = function(req, res, next) {
 exports.getAllCustomers = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var barid = req.params.id;
-  barmodel.getCustomerList(barid, function(err, data) {
+  barmodel.getCustomerList(barid, false, function(err, data) {
     if (err) console.log('Failed in getAllCustomers');
     res.end(JSON.stringify(data));
   });

@@ -265,9 +265,10 @@ var enterBar = function(barId, userId, cb) {
   });
 };
 
-var getCustomerList = function(barId, cb) {
+var getCustomerList = function(barId, keepDup, cb) {
   var sql = 'select uid, createdts from user_enter_bar where bid="'+barId+'" order by createdts desc limit 500';
   var ret = {};
+  var idmap = {};
   util.exeDBQuery(pool, sql, function(err, data) {
     if (err) {
       ret.err = errCode.DBBARGETCUSTOMERS;
@@ -276,9 +277,18 @@ var getCustomerList = function(barId, cb) {
     } else {
       ret.err = 0;
       var rows = data;
+      var row;
       var ids = [];
       for (var i = 0, len = rows.length; i < len; i++) {
-        ids.push(rows[i].uid, rows[i].createdts);
+        row = rows[i];
+        if (!keepDup) {
+          if (!idmap[row.uid]) {
+            idmap[row.uid] = true;
+            ids.push(row.uid, row.createdts);
+          }
+        } else {
+          ids.push(row.uid, row.createdts);
+        }
       }
       ret.uids = ids;
       cb(ret.err, ret);
