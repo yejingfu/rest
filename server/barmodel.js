@@ -310,7 +310,7 @@ var getCustomerList = function(barId, keepDup, cb) {
               if (!err2) {
                 ret.uids.push([data2.uid, data2.phone, data2.status, data2.nickname, data2.gender, data2.avatar, idmap[ids[idx]]]);
               }
-              if (count === len - 1) {
+              if (count === len) {
                 cb(0, ret);
               }
             });
