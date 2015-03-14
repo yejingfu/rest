@@ -113,8 +113,8 @@ server.post('/bar/like', bar.likeBar);
 server.post('/bar/dislike', bar.dislikeBar);
 // Get user id list who recently come in this bar
 // input: id(bar id)
-// output: array of pair (userID, timestamp), example:
-// [userId1, ts1, userId2, ts2, userId3, ts3, ...]
+// output: array of user information, example:
+// [['id1', 'phone', 'status', 'nickname', 'gender', 'avatar', 'createdts'], [...]]
 server.get('/bar/customers/:id', bar.getAllCustomers);
 // Call it if some user comes into this bar
 // input: barid(bar id), userid(user id)

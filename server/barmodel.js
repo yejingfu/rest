@@ -297,7 +297,7 @@ var getCustomerList = function(barId, keepDup, cb) {
         cb(ret.err, ret);
       } else {
         // ids would be include user basic info, like blow:
-        //[['id1', 'phone', 'nickname', 'avatar', 'createdts'], [...]]
+        //[['id1', 'phone', 'status', 'nickname', 'gender', 'avatar', 'createdts'], [...]]
         ids = Object.keys(idmap);
         len = ids.length;
         ret.uids = [];
