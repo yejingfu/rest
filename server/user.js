@@ -168,7 +168,7 @@ exports.getUnreadMessage = function (req, res, next) {
   var friendid = req.params.friendid;
   var ret = {err: 0, msg: ''};
   if (!uid || !friendid) {
-    ret.err = APIPARAMSMISSING;
+    ret.err = errCode.APIPARAMSMISSING;
     ret.msg = 'Invalid uid or friendid';
     return res.end(JSON.stringify(ret));
   }
@@ -190,7 +190,7 @@ exports.clearUnReadMessage = function(req, res, next) {
   var sessionid = req.params.sessionid;
   var ret = {err: 0, msg: ''};
   if (!uid || !sessionid) {
-    ret.err = APIPARAMSMISSING;
+    ret.err = errCode.APIPARAMSMISSING;
     ret.msg = 'Invalid uid or sessionid';
     return res.end(JSON.stringify(ret));
   }
