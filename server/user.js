@@ -162,3 +162,43 @@ exports.getFriendList = function(req, res, next) {
   });
 };
 
+exports.getUnreadMessage = function (req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var uid = req.params.uid;
+  var friendid = req.params.friendid;
+  var ret = {err: 0, msg: ''};
+  if (!uid || !friendid) {
+    ret.err = APIPARAMSMISSING;
+    ret.msg = 'Invalid uid or friendid';
+    return res.end(JSON.stringify(ret));
+  }
+  um.getSessionID(uid, friendid, function(err, data) {
+    if (err) return res.end(JSON.stringify(data));
+    um.getUnreadMessagesBySessionID(data, function(err2, data2){
+      if (err2) return res.end(JSON.stringify(data2));
+      ret.uid = uid;
+      ret.relateid = data;
+      ret.messages = data2;
+      return res.end(JSON.stringify(ret));
+    });
+  });
+};
+
+exports.clearUnReadMessage = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var uid = req.params.uid;
+  var sessionid = req.params.sessionid;
+  var ret = {err: 0, msg: ''};
+  if (!uid || !sessionid) {
+    ret.err = APIPARAMSMISSING;
+    ret.msg = 'Invalid uid or sessionid';
+    return res.end(JSON.stringify(ret));
+  }
+  um.clearUnReadMessagesBySessionID(sessionid, function(err, data) {
+    ret.err = err;
+    ret.msg = JSON.stringify(data);
+    res.end(JSON.stringify(ret));
+  });
+};
+
+

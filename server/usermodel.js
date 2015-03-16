@@ -508,4 +508,51 @@ exports.getFriendIDList = function(uid, count, cb) {
     }
     cb(0, {friends: friends});
   });
-}
+};
+
+exports.getSessionID = function(fromId, toId, cb) {
+  var small = fromId;
+  var large = toId;
+  var row;
+  if (fromId > toId) {
+    small = toId;
+    large = fromId;
+  }
+  var sql = 'select * from friendship where smallid='+small+' and largeid='+large+' limit 1';
+  exeQuery(sql, function(err, data) {
+    if (err) return cb(err, data);
+    row = data[0];
+    cb(0, row.relateid);
+  });
+};
+
+var fetchMessagesBySQL = function(sql, cb) {
+  // list of message [mid, relateid, fromuid, touid, content, status, createdts]
+  var messages = [], i, len, row;
+  exeQuery(sql, function(err, data){
+    if (err) return cb(err, data);
+    for (i = 0, len = data.length; i < len; i++) {
+      row = data[i];
+      messages.push([row.mid, row.relateid, row.fromuid, row.touid, row.content, row.status, row.createdts]);
+    }
+    cb(0, messages);
+  });
+};
+
+exports.getUnreadMessagesByUserID = function(uid, cb) {
+  var sql = 'select * from message where (fromuid='+uid+' or touid='+uid+') and status=0 limit 5000';
+  fetchMessagesBySQL(sql, cb);
+};
+
+exports.getUnreadMessagesBySessionID = function(sid, cb) {
+  var sql = 'select * from message where relateid='+sid+' and status=0 limit 5000';
+  fetchMessagesBySQL(sql, cb);
+};
+
+exports.clearUnReadMessagesBySessionID = function(sid, cb) {
+  var sql = 'update message set status=1 where relateid='+sid;
+  exeQuery(sql, function(err, data){
+    return cb(err, data);
+  });
+};
+

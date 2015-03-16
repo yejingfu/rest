@@ -69,6 +69,14 @@ server.del('/user/:phone', user.handle);
 // output: [[friendId, rename, updated_ts, phone, nickname, avatar, gender, signature, birthday, hobby, job, edu, fav_book, fav_author]]
 server.get('/user/friends/:uid', user.getFriendList);
 
+// input: uid-- current user ID, friendid -- friend user ID (or group ID)
+// output: list of message:
+// [mid, relateid, fromuid, touid, content, status, createdts]
+server.get('/user/unreadmessages/:uid', user.getUnreadMessage);
+
+// input: uid -- current user ID, sessionid -- the session is the chatting between two users
+server.get('/user/clearunreadmessage/:uid', user.clearUnReadMessage);
+
 server.get('/profile/:uid', user.getProfile);
 server.post('/profile/:uid', user.setProfile);
 
