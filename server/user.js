@@ -187,7 +187,7 @@ exports.getUnreadMessage = function (req, res, next) {
 exports.clearUnReadMessage = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var uid = req.params.uid;
-  var sessionid = req.params.sessionid;
+  var sessionid = req.params.relateid;
   var ret = {err: 0, msg: ''};
   if (!uid || !sessionid) {
     ret.err = errCode.APIPARAMSMISSING;

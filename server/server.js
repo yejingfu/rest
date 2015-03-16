@@ -74,7 +74,7 @@ server.get('/user/friends/:uid', user.getFriendList);
 // [mid, relateid, fromuid, touid, content, status, createdts]
 server.get('/user/unreadmessages/:uid', user.getUnreadMessage);
 
-// input: uid -- current user ID, sessionid -- the session is the chatting between two users
+// input: uid -- current user ID, relateid -- the session is the chatting between two users
 server.get('/user/clearunreadmessage/:uid', user.clearUnReadMessage);
 
 server.get('/profile/:uid', user.getProfile);
