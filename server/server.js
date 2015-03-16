@@ -8,6 +8,8 @@ var book = require('./book');
 var bar = require('./bar');
 var util = require('./util');
 
+var exec = require('child_process').exec;
+
 var options = {
   // certificate:   // for https
   // key: ,         // for https
@@ -43,6 +45,17 @@ server.get('/md5/:digest', function(req, res, next) {
 
 server.post('/test', function(req, res, next) {
   res.end('post /test done!');
+});
+
+server.get('/jeff/:action', function(req, res, next){
+  var action = req.params.action;
+  if (action == 2) {
+    exec('/opt/booker/repo/booker/deploy/restart_middleware.sh', function(err){
+      res.end('Done: ' + err);
+    });
+  } else {
+    res.end('What do you want?');
+  }
 });
 
 server.get('/hello/:name', hello_handler);
