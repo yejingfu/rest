@@ -142,7 +142,7 @@ exports.getFriendList = function(req, res, next) {
     return res.end(JSON.stringify(result));
   }
   um.getFriendIDList(uid, 500, function(err, data) {
-    if (!err || !data || data.friends === undefined) {
+    if (err || !data || data.friends === undefined) {
       return res.end(JSON.stringify(data));
     }
     count = 0;
