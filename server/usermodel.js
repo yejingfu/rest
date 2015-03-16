@@ -257,6 +257,16 @@ exports.getProfileByUID = function(uid, cb) {
   });
 };
 
+exports.getUserAndProfileByUID = function(uid, cb) {
+  exports.getUserByUID(uid, function(err, data) {
+    if (err) return cb(err, data);
+    exports.getProfileByUID(uid, function(err2, data2) {
+      if (err2) return cb(err2, data2);
+      cb(0, {user: data.user, profile: data2.profile});
+    });
+  });
+}
+
 exports.getUserBasicInfoByUID = function(uid, cb) {
   var basicInfo = {};
   exports.getUserByUID(uid, function(err, data) {
@@ -483,3 +493,19 @@ var deleteUserByID = function(uid, cb) {
     cb(err, data);
   });
 };
+
+
+exports.getFriendIDList = function(uid, count, cb) {
+  var sql = 'select * from friends where uid = '+uid+' order by updatedts desc limit ' + count;
+  var i, len, row;
+  var friends = [];
+  exeQuery(sql, function(err, data) {
+    if (err) return cb(err, data);
+    for ( i = 0, len = data.length; i < len; i++) {
+      row = data[i];
+      // friendId, rename, updated_ts
+      friends.push([row.friendid, row.rename, row.updatedts]);
+    }
+    cb(0, {friends: friends});
+  });
+}

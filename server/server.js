@@ -66,6 +66,9 @@ server.post('/user/:phone', user.handle);
 server.put('/user/:phone', user.handle);
 server.del('/user/:phone', user.handle);
 
+// output: [[friendId, rename, updated_ts, phone, nickname, avatar, gender, signature, birthday, hobby, job, edu, fav_book, fav_author]]
+server.get('/user/friends/:uid', user.getFriendList);
+
 server.get('/profile/:uid', user.getProfile);
 server.post('/profile/:uid', user.setProfile);
 

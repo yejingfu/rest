@@ -1,5 +1,6 @@
 var um = require('./usermodel');
 var util = require('./util');
+var errCode = require('./error').errCode;
 
 
 ////////////////////////////
@@ -111,5 +112,53 @@ exports.list = function(req, res, next) {
     next();
   });
 
+};
+
+exports.getFriendList = function(req, res, next) {
+  // output: [[friendId, rename, updated_ts, phone, nickname, avatar, gender, signature, birthday, hobby, job, edu, fav_book, fav_author]]
+  res.setHeader('Content-Type', 'text/json');
+  var uid = req.params.uid;
+  var result = {err: 0, friends: [], msg: ''};
+  var i, len, friends, fi, fpi, count, j, len2, f;
+  var friendInfoMap = {};
+  var onDone = function() {
+    for (j = 0, len2 = friends.length; j < len2; j++) {
+      f = friends[j];
+      fi = friendInfoMap[f[0]];
+      if (!fi) {
+        result.err = errCode.DBFRIENDLIST;
+        result.msg = 'Failed to get friend information: ' + f[0];
+        return res.end(JSON.stringify(result));
+      }
+      fpi = fi.profile;
+      result.friends.push([f[0], f[1], f[2], fi.user.phone, fpi.nickname, fpi.avatar, fpi.gender, fpi.signature, fpi.birthday, fpi.hobby, fpi.job, fpi.edu, fpi.favoritebook, fpi.favoriteauthor]);
+    }
+    return res.end(JSON.stringify(result));
+  };
+
+  if (!uid) {
+    result.err = errCode.APIUSERIDISEMPTY;
+    result.msg = 'Failed to get friend list because of empty uid';
+    return res.end(JSON.stringify(result));
+  }
+  um.getFriendIDList(uid, 500, function(err, data) {
+    if (!err || !data || data.friends === undefined) {
+      return res.end(JSON.stringify(data));
+    }
+    count = 0;
+    friends = data.friends;
+    for (i = 0, len = friends.length; i < len; i++) {
+        um.getUserAndProfileByUID(friends[i][0], function(err2, data2) {
+          count++;
+          if (!err2) {
+            friendInfoMap[data2.user.uid] = data2;
+          }
+          if (count === len) {
+            onDone();
+            return;
+          }
+        });
+    }
+  });
 };
 
