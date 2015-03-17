@@ -79,7 +79,7 @@ server.get('/user/clearunreadmessage/:uid', user.clearUnReadMessage);
 
 // input: uid -- current user ID
 // output: the list of groups which the current participate in.
-// [[groupId, groupName, groupTopic, ownerId]]
+// [[groupId, groupName, groupTopic, groupType, ownerId, barId]]
 server.get('/user/groups/:uid', user.getGroups);
 
 server.get('/profile/:uid', user.getProfile);

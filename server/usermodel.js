@@ -565,7 +565,7 @@ exports.getGroupInfoByUserID = function(uid, cb) {
     if (err) return cb(err, data);
     for (i = 0, len = data.length; i < len; i++) {
       gid = data[i].touid;
-      if (gid > 10000 && groupIds[gid] !== undefined) {
+      if (gid > 10000 && groupIds[gid] === undefined) {
         groupIds[gid] = true;
       }
     }
@@ -573,11 +573,11 @@ exports.getGroupInfoByUserID = function(uid, cb) {
     if (keys.length === 0) {
       return cb(0, ret);
     }
-    sql = 'select * from bkgroupd where gid in(';
+    sql = 'select * from bkgroup where gid in(';
     for (i = 0, len = keys.length-1; i < len; i++) {
       sql += keys[i]+',';
     }
-    sql += keys[len+1]+')';
+    sql += keys[len]+')';
     exeQuery(sql, function(err2, data2){
       if (err2) return cb(err2, data2);
       for (i = 0, len = data2.length; i < len; i++) {
