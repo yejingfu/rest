@@ -201,4 +201,18 @@ exports.clearUnReadMessage = function(req, res, next) {
   });
 };
 
+exports.getGroups = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var uid = req.params.uid;
+  var ret = {err: 0, msg: ''};
+  if (!uid) {
+    ret.err = errCode.APIPARAMSMISSING;
+    ret.msg = 'Invalid uid or sessionid';
+    return res.end(JSON.stringify(ret));
+  }
+  um.getGroupInfoByUserID(uid, function(err, data) {
+    return res.end(JSON.stringify(data));
+  });
+};
+
 

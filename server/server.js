@@ -77,6 +77,11 @@ server.get('/user/unreadmessages/:uid', user.getUnreadMessage);
 // input: uid -- current user ID, relateid -- the session is the chatting between two users
 server.get('/user/clearunreadmessage/:uid', user.clearUnReadMessage);
 
+// input: uid -- current user ID
+// output: the list of groups which the current participate in.
+// [[groupId, groupName, groupTopic, ownerId]]
+server.get('/user/groups/:uid', user.getGroups);
+
 server.get('/profile/:uid', user.getProfile);
 server.post('/profile/:uid', user.setProfile);
 

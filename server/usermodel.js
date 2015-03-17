@@ -556,3 +556,36 @@ exports.clearUnReadMessagesBySessionID = function(sid, cb) {
   });
 };
 
+exports.getGroupInfoByUserID = function(uid, cb) {
+  var sql = 'select touid from message where fromuid='+uid+' order by createdts desc limit 10000';
+  var groupIds = {}, grp, keys;
+  var i, len, gid;
+  var ret = {err: 0, msg: '', groups: []};
+  exeQuery(sql, function(err, data) {
+    if (err) return cb(err, data);
+    for (i = 0, len = data.length; i < len; i++) {
+      gid = data[i].touid;
+      if (gid > 10000 && groupIds[gid] !== undefined) {
+        groupIds[gid] = true;
+      }
+    }
+    keys = Object.keys(groupIds);
+    if (keys.length === 0) {
+      return cb(0, ret);
+    }
+    sql = 'select * from bkgroupd where gid in(';
+    for (i = 0, len = keys.length-1; i < len; i++) {
+      sql += keys[i]+',';
+    }
+    sql += keys[len+1]+')';
+    exeQuery(sql, function(err2, data2){
+      if (err2) return cb(err2, data2);
+      for (i = 0, len = data2.length; i < len; i++) {
+        grp = data2[i];
+        ret.groups.push([grp.gid, grp.name, grp.content, grp.grptype, grp.owner, grp.bid]);
+      }
+      return cb(0, ret);
+    });
+  });
+};
+
