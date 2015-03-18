@@ -199,6 +199,31 @@ var addBar = function(obj, cb) {
   saveToDB(dto, cb);
 };
 
+var updateBar = function(obj, cb) {
+  var dto = new BarDTO();
+  dto.fromJSON(obj);
+  var ts = util.now();
+  var ret = {};
+  if (dto.latitude !== undefined && dto.latitude !== null) dto.latitude *= 1000000;
+  if (dto.longitude !== undefined && dto.longitude !== null) dto.longitude *= 1000000;
+  var sql = 'update bar set bname="'+dto.bname+'", tel="'+dto.tel+'", address="'+dto.address+'", descr="'+dto.descr+
+    '", latitude="'+dto.latitude+'", longitude="'+dto.longitude+'", district="'+dto.district+'", rank="'+dto.rank+
+    '", photoes="'+dto.photoes+'", updatedts="'+ts+'" where bid="'+dto.bid+'"';
+  //console.log('sql: ' + sql);
+  util.exeDBQuery(pool, sql, function(err, data) {
+    console.log('exeDBQuery: ' + err);
+    if (err) {
+      ret.err = errCode.DBFAILEDADDBAR;
+      ret.msg = 'Failed to add bar: ' + data.msg;
+      cb(ret.err, ret);
+    } else {
+      ret.err = 0;
+      ret.msg = 'Success';
+      cb(ret.err, ret);
+    }
+  });
+};
+
 var likeBar = function(barId, userId, cb) {
   var sql = 'insert into user_like_bar(uid, bid, createdts) values("'+
     userId+'", "'+barId+'", "'+util.now()+'")';
@@ -327,6 +352,7 @@ var getCustomerList = function(barId, keepDup, cb) {
 };
 
 exports.addBar = addBar;
+exports.updateBar = updateBar;
 exports.getAllBars = getAllBars;
 exports.getAllBarIds = getAllBarIds;
 exports.getBarById = getBarById;

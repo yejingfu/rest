@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" type="text/css" href="http://developer.amap.com/Public/css/demo.Default.css" />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="http://webapi.amap.com/maps?v=1.3"></script>
+    <script>
+      var mapObj;
+      function mapInit(){
+        mapObj = new AMap.Map("iCenter");
+        var clickEventListener=AMap.event.addListener(mapObj,'click',function(e){
+		  document.getElementById("barLat").value=e.lnglat.getLat();
+		  document.getElementById("barLong").value=e.lnglat.getLng();
+        });
+      }
+  </script>
+  </head>
+  <body onLoad="mapInit()">
+    <h1>Add Bar</h1>
+    <hr>
+    <form method='post' enctype='multipart/form-data' action='/bar/edit/<%=bar.bid%>'>
+      <p>Check Code: <input type='text', name='barCHK', placeholder='Check code'/></p>
+      <p>Name: <input type='text', name='barName', placeholder='Name' value='<%=bar.bname%>'/></p>
+      <p>Tel: <input type='text', name='barTel', placeholder='Tel' value='<%=bar.tel%>'/></p>
+      <p>Address: <input type='text', name='barAddress', placeholder='Address' value='<%=bar.address%>'/></p>
+      <p>Description: <textarea name='barDesc' rows='5' cols='20'><%=bar.descr%></textarea></p>
+      <p>District: <select name='barDistrict'>
+        <option value='1'>静安区</option>
+        <option value='2'>黄浦区</option>
+        <option value='3'>卢湾区</option>
+        <option value='4'>徐汇区</option>
+        <option value='5'>长宁区</option>
+        <option value='6'>普陀区</option>
+        <option value='7'>杨浦区</option>
+        <option value='8'>闵行区</option>
+        <option value='9'>闸北区</option>
+        <option value='10'>虹口区</option>
+        <option value='11'>宝山区</option>
+        <option value='12'>嘉定区</option>
+        <option value='13'>松江区</option>
+        <option value='14'>浦东新区</option>
+        <option value='15'>金山区</option>
+        <option value='16'>青浦区</option>
+        <option value='17'>南汇区</option>
+        <option value='18'>奉贤区</option>
+        <option value='19'>崇明县</option>
+      </select></p>
+      <p>Photo 1: <input type='file', name='barPhoto'/></p>
+      <p>Photo 2: <input type='file', name='barPhoto'/></p>
+      <p>Photo 3: <input type='file', name='barPhoto'/></p>
+      <p>Photo 4: <input type='file', name='barPhoto'/></p>
+      <p>Photo 5: <input type='file', name='barPhoto'/></p>
+      <p>Photo 6: <input type='file', name='barPhoto'/></p>
+      <p>Photo 7: <input type='file', name='barPhoto'/></p>
+      <p>Photo 8: <input type='file', name='barPhoto'/></p>
+      <p>Photo 9: <input type='file', name='barPhoto'/></p>
+      <p>Photo 10: <input type='file', name='barPhoto'/></p>
+      <p>Latitude: <input type='text', id='barLat', name='barLat' value='<%=bar.latitude%>'/></p>
+      <p>Longitude: <input type='text', id='barLong', name='barLong' value='<%=bar.longitude%>'/></p>
+      <p><input type='submit', value='update'/></p>
+    </form>
+    <div id="iCenter"></div>
+  </body>
+</html>
+
+

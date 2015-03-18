@@ -127,6 +127,33 @@ exports.addBar2 = function(req, res, next) {
   req.read();
 };
 
+exports.updateBar2 = function(req, res, next) {
+  // get post request from Node.js client 
+  res.setHeader('Content-Type', 'text/json');
+  
+  var data = '', ret = {}, obj;
+  req.on('data', function(chunk) {
+    data += chunk;
+  });
+  req.on('end', function() {
+    obj = JSON.parse(data);
+    barmodel.updateBar(obj, function(err, data2) {
+      if (err) {
+        console.log('Failed to update bar into DB: ' + err.msg);
+      } else {
+        console.log('Succeed to update bar into DB');
+        res.end(JSON.stringify(data2));
+      }
+    });
+  });
+  req.on('error', function(e) {
+    ret.err = errCode.APIBARFAILED;
+    ret.msg = 'Failed to read request from client';
+    res.end(JSON.stringify(ret));
+  });
+  req.read();
+};
+
 exports.getAllBooks = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var barid = req.params.barid;

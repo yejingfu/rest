@@ -125,6 +125,7 @@ server.get('/bar/allids', bar.getAllBarIds);
 server.post('/bar', bar.addBar);
 // add bar information from REST client
 server.post('/bar2', bar.addBar2);
+server.post('/updatebar2', bar.updateBar2);
 // get all books from bar, inputs: `barid` and `bookcat`
 server.get('/bar/books', bar.getAllBooks);
 
