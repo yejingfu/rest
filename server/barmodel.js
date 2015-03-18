@@ -47,8 +47,6 @@ BarDTO.prototype = {
     this.descr = obj.descr || '';
     this.latitude = obj.latitude || 0;
     this.longitude = obj.longitude || 0;
-    this.latitude /= 1000000;
-    this.longitude /= 1000000;
     this.district = obj.district || 0;
     this.rank = obj.rank || 1;
     this.photoes = obj.photoes || '';
@@ -163,10 +161,13 @@ var getBarByDistrictId = function(districtId, cb) {
 };
 
 var extractBarDTOFromDB = function(rows) {
-  var dto = [];
+  var dto = [], row;
   for (var i = 0, len = rows.length; i < len; i++) {
+    row = rows[i];
+    row.latitude /= 1000000;
+    row.longitude /= 1000000;
     var bar = new BarDTO();
-    bar.fromJSON(rows[i]);
+    bar.fromJSON(row);
     dto.push(bar);
   }
   return dto;
