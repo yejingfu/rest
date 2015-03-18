@@ -7,6 +7,8 @@ var fs = require('fs-extra');
 
 var app = undefined;
 
+var DBServerIP = '121.199.58.239';
+
 router.setApp = function(app_) { app = app_; }
 
 var printBody = function(req) {
@@ -20,7 +22,7 @@ var printObject = function(obj) {
 };
 
 var getAllBars = function(cb) {
-  var client = http.get('http://121.199.58.239:3011/bar/all', function(res) {
+  var client = http.get('http://'+DBServerIP+':3011/bar/all', function(res) {
     console.log('received from server:'+ res.statusCode);
     if (res.statusCode !== 200) {
       return cb(1, 'statusCode: ' + res.statusCode);
@@ -128,6 +130,8 @@ router.post('/add', function(req, res) {
         count += 1;
         if (!err) {
           validImageNames.push(newName);
+        } else {
+          console.log('Failed to upload image: form:'+from+'--to: ' + to);
         }
         if (count === len) {
           if (validImageNames.length === 0) {
@@ -146,7 +150,7 @@ router.post('/add', function(req, res) {
 
 var addBarToServer = function(barObj, cb) {
   var options = {
-    hostname: 'localhost',    //'121.199.58.239',
+    hostname: DBServerIP, //'121.199.58.239',
     port: 3011,
     path: '/bar2',
     method: 'POST'
