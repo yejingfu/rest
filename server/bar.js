@@ -23,6 +23,7 @@ exports.getBarById = function(req, res, next) {
 var getBarLikes = function(bars, cb) {
   var len = bars.length;
   var i, j = 0;
+  if (bars.length === 0) return cb();
   for (i = 0; i < len; i ++) {
     (function(idx){
     barmodel.getLikeList(bars[idx].bid, function(err, data) {
