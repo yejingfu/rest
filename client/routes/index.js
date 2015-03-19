@@ -1,4 +1,5 @@
 var path = require('path');
+var http = require('http');
 var fs = require('fs-extra');
 var uuid = require('node-uuid');
 
@@ -63,7 +64,7 @@ router.getFeedbacks = function(req, res) {
     for (i = 0, len = feedbacks.length; i < len; i++) {
       content = feedbacks[i][2];
       feedbacks[i][2] = new Buffer(content, 'base64').toString('utf8');
-      console.log('feedback['+i+']:' + feedbacks[i][2]);
+      //console.log('feedback['+i+']:' + feedbacks[i][2]);
     }
     ctx = {title: 'feedback', feedbacks: feedbacks};
     res.render('feedback', ctx);
