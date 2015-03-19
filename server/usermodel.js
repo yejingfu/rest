@@ -593,7 +593,7 @@ exports.getFeedbacks = function(uid, cb) {
   var sql;
   var ret = {err: 0, msg: '', feedbacks: []};
   var i, len, row;
-  if (uid) {
+  if (uid && uid != 0) {
     sql = 'select * from feedback where uid='+uid;
   } else {
     sql = 'select * from feedback';
@@ -607,4 +607,5 @@ exports.getFeedbacks = function(uid, cb) {
       ret.feedbacks.push([row.id, row.uid, row.content, row.createdts]);
     }
     cb(0, ret);
+  });
 };
