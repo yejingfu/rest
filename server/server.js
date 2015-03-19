@@ -82,6 +82,11 @@ server.get('/user/clearunreadmessage/:uid', user.clearUnReadMessage);
 // [[groupId, groupName, groupTopic, groupType, ownerId, barId]]
 server.get('/user/groups/:uid', user.getGroups);
 
+// input uid -- the user who sent the feedbacks. If uid is empty, return all feedbacks
+// output -- array of feedbacks:
+// [[id, uid, content, createdts], ...]
+server.get('/user/feedbacks/:uid', user.getFeedbacks);
+
 server.get('/profile/:uid', user.getProfile);
 server.post('/profile/:uid', user.setProfile);
 

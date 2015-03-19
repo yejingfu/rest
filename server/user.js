@@ -215,4 +215,12 @@ exports.getGroups = function(req, res, next) {
   });
 };
 
+exports.getFeedbacks = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var uid = req.params.uid;
+  var ret = {err: 0, msg: ''};
+  um.getFeedbacks(uid, function(err, data) {
+    return res.end(JSON.stringify(data));
+  });
+};
 

@@ -589,3 +589,22 @@ exports.getGroupInfoByUserID = function(uid, cb) {
   });
 };
 
+exports.getFeedbacks = function(uid, cb) {
+  var sql;
+  var ret = {err: 0, msg: '', feedbacks: []};
+  var i, len, row;
+  if (uid) {
+    sql = 'select * from feedback where uid='+uid;
+  } else {
+    sql = 'select * from feedback';
+  }
+  sql += ' order by createdts desc limit 1000';
+
+  exeQuery(sql, function(err, data) {
+    if (err) return cb(err, data);
+    for (i = 0, len = data.length; i < len; i++) {
+      row = data[i];
+      ret.feedbacks.push([row.id, row.uid, row.content, row.createdts]);
+    }
+    cb(0, ret);
+};
