@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Feedback list</h1>
+    <hr>
+    <p><%= title %></p>
+    <p>
+      <% for (var i = 0, len = feedbacks.length; i < len; i++) { %>
+      <div style="border: dashed gray 1px; margin:4px; padding:4px;"><%= JSON.stringify(feedbacks[i])%><br/>
+        <a href="http://121.199.58.239:3011/profile/<%=feedbacks[i][1]%>">show user</a>
+      </div>
+      <% } %>
+    </p>
+  </body>
+</html>
+
+

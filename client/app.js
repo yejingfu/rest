@@ -35,6 +35,7 @@ app.use('/users', users);
 app.use('/book', book);
 app.use('/bar', bar);
 app.use('/uploadimage', routes.uploadimage);
+app.use('/feedbacks/:uid', routes.getFeedbacks);
 
 app.get('/book/category/:cat', function(req, res){
   var cat = req.params.cat || 0;

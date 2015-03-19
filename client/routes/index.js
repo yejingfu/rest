@@ -55,4 +55,41 @@ router.uploadimage = function(req, res) {
   }
 };
 
+router.getFeedbacks = function(req, res) {
+  var uid = req.params.uid || 0;
+  var feedbacks, i, len, content, ctx;
+  var doRender = function(obj) {
+    feedbacks = obj.feedbacks || [];
+    for (i = 0, len = feedbacks.length; i < len; i++) {
+      content = feedbacks[i][2];
+      feedbacks[i][2] = new Buffer(content, 'base64').toString('utf8');
+      console.log('feedback['+i+']:' + feedbacks[i][2]);
+    }
+    ctx = {title: 'feedback', feedbacks: feedbacks};
+    res.render('feedback', ctx);
+  };
+
+  var client = http.get('http://121.199.58.239:3011/user/feedbacks/'+uid, function(res2) {
+    console.log('getFeedbacks received from server: ' + res2.statusCode);
+    if (res2.statusCode !== 200) {
+      return res.end('Failed to get feedback from DB, statusCode: ' + res2.statusCode);
+    }
+    var data = '';
+    res2.on('data', function(d) {
+      data += d;
+    });
+    res2.on('end', function() {
+      doRender(JSON.parse(data));
+    });
+    res2.on('error', function(e) {
+      return res.end('Failed to get feedback from DB: ' + e);
+    });
+    res2.read();
+  });
+
+  client.on('error', function(e) {
+    return res.end('Failed to connect to server: ' + e);
+  });
+};
+
 module.exports = router;
