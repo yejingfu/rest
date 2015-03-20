@@ -19,6 +19,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 //app.set('imagepath', path.join(__dirname, 'public', 'images'));
 app.set('imagepath', '/opt/booker/storage');
+app.set('DBServerIP', '121.199.58.239');  // localhost
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -36,6 +37,9 @@ app.use('/book', book);
 app.use('/bar', bar);
 app.use('/uploadimage', routes.uploadimage);
 app.use('/feedbacks/:uid', routes.getFeedbacks);
+
+app.get('/recommend', routes.showRecommendation);
+app.post('/recommend', routes.postRecommendation);
 
 app.get('/book/category/:cat', function(req, res){
   var cat = req.params.cat || 0;
@@ -84,6 +88,7 @@ app.post('/book/category', function(req, res) {
 });
 
 bar.setApp(app);
+routes.setApp(app);
 
 app.use(function(req, res, next) {
     var err = new Error('Not Found');

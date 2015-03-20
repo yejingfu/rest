@@ -2,11 +2,15 @@ var path = require('path');
 var http = require('http');
 var fs = require('fs-extra');
 var uuid = require('node-uuid');
+var multiparty = require('multiparty');
 
 var express = require('express');
 var router = express.Router();
 
 var imgStoragePath = path.join(__dirname, '..', 'public', 'images');
+
+var app = undefined;
+router.setApp = function(app_) { app = app_; }
 
 var saveBase64Image = function(body, cb) {
   var ret = {err: 0};
@@ -90,6 +94,63 @@ router.getFeedbacks = function(req, res) {
 
   client.on('error', function(e) {
     return res.end('Failed to connect to server: ' + e);
+  });
+};
+
+router.showRecommendation = function(req, res) {
+  var ctx = {title: 'Booker'};
+  res.render('recommendation', ctx);
+};
+
+router.postRecommendation = function(req, res) {
+
+  var addToDBServer = function(title, summary, thumbnail, cb) {
+    console.log('addToDBServer: ' + title + '--' + summary+'--'+thumbnail);
+    var options = {
+      hostname: app.get('DBServerIP'),
+      port: 3011,
+      path: '/recommendation',
+      method: 'POST'
+    };
+
+    var client = http.request(options, function(res2) {
+      if (res2.statusCode !== 200) {
+        console.log('HEADERS: ' + JSON.stringify(res2.headers));
+        cb(1);
+      } else {
+        cb(0);
+      }
+    });
+
+    client.on('error', function() {
+      cb(2);
+    });
+    var reqObj = {
+      title: title,
+      summary: summary,
+      thumbnail: thumbnail
+    };
+    client.write(JSON.stringify(reqObj));
+    client.end();
+  };
+
+  var form = new multiparty.Form();
+  form.parse(req, function(err, fields, files) {
+    if (err) return res.end("Failed to parse multiparty form");
+    var title = fields['recTitle'][0];
+    var summary = fields['recSummary'][0];
+    var thumbnail = files['recThumbnail'][0];
+    if (!title || !summary || !thumbnail) return res.end("Invalid title, summary or thumbnail");
+    var imgPath = thumbnail.path;
+    var imgName = path.basename(imgPath);
+    var imgNewPath = path.join(app.get('imagepath'), imgName);
+    fs.move(imgPath, imgNewPath, function(err2) {
+      if (err2) return res.end('Failed to store image into: ' + imgNewPath);
+      addToDBServer(title, summary, imgName, function(err3) {
+        if (err3) return res.end('Failed to upload to server: ' + err3);
+        else return res.end('Succeed to post book recommandation!<br><a href="/recommend">add more</a>');
+      });
+    });
   });
 };
 

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Add daily book recommendation</h1>
+    <hr>
+    <form method='post' enctype='multipart/form-data' action='/recommend'>
+      <p>Check Code: <input type='text', name='recCHK', placeholder='Check code'/></p>
+      <p>Title: <input type='text', name='recTitle', placeholder='Title'/></p>
+      <p>Summary: <input type='text', name='recSummary', placeholder='Summary'/></p>
+      <p>Thumbnail: <input type='file', name='recThumbnail'/></p>
+      <p><input type='submit', value='Add'/></p>
+    </form>
+  </body>
+</html>
+
+
