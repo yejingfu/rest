@@ -129,11 +129,11 @@ var getLatestRecommendation = function(cb) {
 };
 
 router.showRecommendation = function(req, res) {
-  var ctx = {title: 'Booker'};
+  var ctx = {title: 'Booker', recommendation: {found: false } };
   getLatestRecommendation(function(err, data) {
     if (!err) {
       var obj = JSON.parse(data);
-      if (obj.err) {
+      if (!obj.err) {
         var prefix = 'data:image/';
         var basename = path.extname(obj.thumbnail).toLowerCase();
         if (basename === '.png') {
@@ -147,14 +147,13 @@ router.showRecommendation = function(req, res) {
         }
         prefix += ';base64,';
         ctx.recommendation = {
+          found: true,
           title: (new Buffer(obj.title, 'base64').toString('utf8')),
           summary: (new Buffer(obj.summary, 'base64').toString('utf8')),
           thumbnail: obj.thumbnail,
           rawdata: prefix+obj.rawdata
         };
       }
-    } else {
-      ctx.recommendation = {notFound: 1};
     }
     res.render('recommendation', ctx);
   });
