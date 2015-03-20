@@ -133,24 +133,28 @@ router.showRecommendation = function(req, res) {
   getLatestRecommendation(function(err, data) {
     if (!err) {
       var obj = JSON.parse(data);
-      var prefix = 'data:image/';
-      var basename = path.extname(obj.thumbnail).toLowerCase();
-      if (basename === '.png') {
-        prefix += 'png';
-      } else if (basename === '.jpg') {
-        prefix += 'jpg';
-      } else if (basename === '.jpeg') {
-        prefix += 'jpeg';
-      } else {
-        prefix += 'jpg';
+      if (obj.err) {
+        var prefix = 'data:image/';
+        var basename = path.extname(obj.thumbnail).toLowerCase();
+        if (basename === '.png') {
+          prefix += 'png';
+        } else if (basename === '.jpg') {
+          prefix += 'jpg';
+        } else if (basename === '.jpeg') {
+          prefix += 'jpeg';
+        } else {
+          prefix += 'jpg';
+        }
+        prefix += ';base64,';
+        ctx.recommendation = {
+          title: (new Buffer(obj.title, 'base64').toString('utf8')),
+          summary: (new Buffer(obj.summary, 'base64').toString('utf8')),
+          thumbnail: obj.thumbnail,
+          rawdata: prefix+obj.rawdata
+        };
       }
-      prefix += ';base64,';
-      ctx.recommendation = {
-        title: (new Buffer(obj.title, 'base64').toString('utf8')),
-        summary: (new Buffer(obj.summary, 'base64').toString('utf8')),
-        thumbnail: obj.thumbnail,
-        rawdata: prefix+obj.rawdata
-      };
+    } else {
+      ctx.recommendation = {notFound: 1};
     }
     res.render('recommendation', ctx);
   });
