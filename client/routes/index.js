@@ -107,7 +107,7 @@ router.postRecommendation = function(req, res) {
   var addToDBServer = function(title, summary, thumbnail, cb) {
     console.log('addToDBServer: ' + title + '--' + summary+'--'+thumbnail);
     var options = {
-      hostname: app.get('DBServerIP'),
+      hostname: app.get('DBServerIP'),  //'localhost'
       port: 3011,
       path: '/recommendation',
       method: 'POST'
@@ -115,8 +115,8 @@ router.postRecommendation = function(req, res) {
 
     var client = http.request(options, function(res2) {
       if (res2.statusCode !== 200) {
-        console.log('HEADERS: ' + JSON.stringify(res2.headers));
-        cb(1);
+        console.log('Faied to call DB server: ' + res2.statusCode);
+        cb(1 + ':'+res2.statusCode);
       } else {
         cb(0);
       }
