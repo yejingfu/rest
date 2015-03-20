@@ -166,7 +166,7 @@ var base64Encode = function(str) {
 router.postRecommendation = function(req, res) {
 
   var addToDBServer = function(title, summary, thumbnail, cb) {
-    console.log('addToDBServer: ' + title + '--' + summary+'--'+thumbnail);
+    //console.log('addToDBServer: ' + title + '--' + summary+'--'+thumbnail);
     var options = {
       hostname: app.get('DBServerIP'),  //'localhost'
       port: 3011,
