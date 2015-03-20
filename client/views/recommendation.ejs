@@ -14,6 +14,20 @@
       <p>Thumbnail: <input type='file', name='recThumbnail'/></p>
       <p><input type='submit', value='Add'/></p>
     </form>
+    <hr>
+    <h1>Latest recommendation</h1>
+    <% if (recommendation) { %>
+    <p>
+      <div style="border: dashed gray 1px; margin:4px; padding:4px;">
+        <h3><%= recommendation.title %> </h3>
+        <%= recommendation.summary %> <br/><br/>
+        <%= recommendation.thumbnail %><br/>
+        <img src="<%= recommendation.rawdata %>"/>
+      </div>
+    </p>
+    <% } else { %>
+    <p><div>No book recommendation founded!</div></p>
+    <% } %>
   </body>
 </html>
 

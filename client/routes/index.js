@@ -97,9 +97,63 @@ router.getFeedbacks = function(req, res) {
   });
 };
 
+var getLatestRecommendation = function(cb) {
+  var ret = {err: 0, msg:''};
+  var client = http.get('http://'+app.get('DBServerIP')+':3011/recommendation', function(res2) {
+    console.log('getLatestRecommendation received from server: ' + res2.statusCode);
+    if (res2.statusCode !== 200) {
+      ret.err = 1;
+      ret.msg = 'Failed to get recommendation from DB: ' + res2.statusCode;
+      cb(ret.err, ret);
+    }
+    var data = '';
+    res2.on('data', function(d) {
+      data += d;
+    });
+    res2.on('end', function() {
+      cb(0, data);
+    });
+    res2.on('error', function(e) {
+      ret.err = 2;
+      ret.mag = 'Failed to parse stream received from DB: ' + e;
+      cb(ret.err, ret);
+    });
+    res2.read();
+  });
+
+  client.on('error', function(e) {
+      ret.err = 3;
+      ret.mag = 'Failed to connect to DB server: ' + e;
+      cb(ret.err, ret);
+  });
+};
+
 router.showRecommendation = function(req, res) {
   var ctx = {title: 'Booker'};
-  res.render('recommendation', ctx);
+  getLatestRecommendation(function(err, data) {
+    if (!err) {
+      var obj = JSON.parse(data);
+      var prefix = 'data:image/';
+      var basename = path.extname(obj.thumbnail).toLowerCase();
+      if (basename === '.png') {
+        prefix += 'png';
+      } else if (basename === '.jpg') {
+        prefix += 'jpg';
+      } else if (basename === '.jpeg') {
+        prefix += 'jpeg';
+      } else {
+        prefix += 'jpg';
+      }
+      prefix += ';base64,';
+      ctx.recommendation = {
+        title: (new Buffer(obj.title, 'base64').toString('utf8')),
+        summary: (new Buffer(obj.summary, 'base64').toString('utf8')),
+        thumbnail: obj.thumbnail,
+        rawdata: prefix+obj.rawdata
+      };
+    }
+    res.render('recommendation', ctx);
+  });
 };
 
 var base64Encode = function(str) {
