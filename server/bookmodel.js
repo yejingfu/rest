@@ -258,10 +258,47 @@ var removeBookFromBarShelf = function(bkid, barid, cb) {
   });
 };
 
+var saveRecommendationToDB = function(obj, cb) {
+  var ret = {err: 0, msg: ''};
+  var sql = 'insert into recommendation(title, summary, thumbnail, createdts) values("'+
+    obj.title+'", "'+obj.summary+'", "'+obj.thumbnail+'", "'+util.now()+'")';
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) {
+      ret.err = errCode.DBFAILEDADDRECOMMENDATION;
+      ret.msg = 'Failed to add recommendation: ' + data.msg;
+      cb(ret.err, ret);
+    } else {
+      cb(0, ret);
+    }
+  });
+};
+
+var getLatestRecommendation = function(cb) {
+  var ret = {err: 0, msg: ''}, obj = null;
+  var sql = 'select * from recommendation order by createdts desc limit 1';
+  util.exeDBQuery(pool, sql, function(err, data) {
+    if (err) return cb(err, data);
+    if (!data || data.length === 0) {
+      ret.err = errCode.DBEMPTY;
+      ret.msg = 'No recommendation is found in DB';
+      return cb(ret.err, ret);
+    }
+    obj = {
+      title: data[0].title,
+      summary: data[0].summary,
+      thumbnail: data[0].thumbnail,
+      createdts: data[0].createdts
+    };
+    cb(0, obj);
+  });
+};
+
 exports.BookDTO = BookDTO;
 exports.getBookByIsbn = getBookByIsbn;
 exports.getBookByBkIds = getBookByBkIds;
 exports.addBookFromDouban = addBookFromDouban;
 exports.addBookToBarShelf = addBookToBarShelf;
 exports.removeBookFromBarShelf = removeBookFromBarShelf;
+exports.saveRecommendationToDB = saveRecommendationToDB;
+exports.getLatestRecommendation = getLatestRecommendation;
 

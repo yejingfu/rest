@@ -383,3 +383,49 @@ exports.updateCategory2 = function(req, res, next) {
   });
   req.read();
 };
+
+exports.addBookRecommendation = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var data = '', ret = {err: 0, msg: 'Succeed'}, obj;
+  req.on('data', function(chunk) {
+    data += chunk;
+  });
+  req.on('end', function(){
+    obj = JSON.parse(data);
+    //console.log('addBookRecommendation: ' + data);
+    bookmodel.saveRecommendationToDB(obj, function(err, data2) {
+      if (err) {
+        res.statusCode = 500;
+        return res.end(JSON.stringify(data2));
+      } else {
+        return res.end(JSON.stringify(data2));
+      }
+    });
+  });
+  req.on('error', function(e) {
+    ret.err = errCode.APIBOOKFAILED;
+    ret.msg = 'Failed to save recommendation to DB';
+    res.end(JSON.stringify(ret));
+  });
+  req.read();
+};
+
+exports.getBookRecommendation = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var ret = {err: 0, title: 'test', summary:'test', thumbnail:'test.jpg', rawdata: ''};
+  bookmodel.getLatestRecommendation(function(err, data) {
+    if (err) return res.end(JSON.stringify(data));
+    ret.title = data.title;
+    ret.summary = data.summary;
+    ret.thumbnail = data.thumbnail;
+    util.encodeImage(data.thumbnail, function(err2, data2) {
+      if (err2) {
+        ret.err = err2;
+        ret.msg = 'Failed to read image content';
+        return res.end(JSON.stringify(ret));
+      }
+      ret.rawdata = data2;
+      return res.end(JSON.stringify(ret));
+    });
+  });
+};

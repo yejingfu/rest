@@ -118,6 +118,9 @@ server.get('/book/category/:cat', book.getBookByCategory);
 server.post('/book/category', book.updateCategory);
 server.post('/book/category2', book.updateCategory2); // used for client only
 
+server.post('/recommendation', book.addBookRecommendation);
+server.get('/recommendation', book.getBookRecommendation);
+
 // get bar information by id
 server.get('/bar/id/:id', bar.getBarById);
 // get all bars inside of the district

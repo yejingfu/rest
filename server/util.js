@@ -143,6 +143,14 @@ exports.postImage = function(req, res, next) {
   });
 };
 
+exports.encodeImage = function(filename, cb) {
+  fs.readFile(path.join(exports.imgFolder, filename), function(err, data) {
+    if (err) return cb(err, data);
+    var base64str = data.toString('base64');
+    cb(0, base64str);
+  });
+};
+
 exports.getAllDistricts = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
   var sql = 'select * from district';
