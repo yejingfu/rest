@@ -102,6 +102,10 @@ router.showRecommendation = function(req, res) {
   res.render('recommendation', ctx);
 };
 
+var base64Encode = function(str) {
+  return new Buffer(str).toString('base64');
+};
+
 router.postRecommendation = function(req, res) {
 
   var addToDBServer = function(title, summary, thumbnail, cb) {
@@ -137,18 +141,22 @@ router.postRecommendation = function(req, res) {
   var form = new multiparty.Form();
   form.parse(req, function(err, fields, files) {
     if (err) return res.end("Failed to parse multiparty form");
-    var title = fields['recTitle'][0];
-    var summary = fields['recSummary'][0];
+    var title = base64Encode(fields['recTitle'][0]);
+    var summary = base64Encode(fields['recSummary'][0]);
     var thumbnail = files['recThumbnail'][0];
-    if (!title || !summary || !thumbnail) return res.end("Invalid title, summary or thumbnail");
+    if (!title || !summary || !thumbnail || thumbnail.size == 0) return res.end("Invalid title, summary or thumbnail");
     var imgPath = thumbnail.path;
     var imgName = path.basename(imgPath);
     var imgNewPath = path.join(app.get('imagepath'), imgName);
     fs.move(imgPath, imgNewPath, function(err2) {
       if (err2) return res.end('Failed to store image into: ' + imgNewPath);
       addToDBServer(title, summary, imgName, function(err3) {
-        if (err3) return res.end('Failed to upload to server: ' + err3);
-        else return res.end('Succeed to post book recommandation!<br><a href="/recommend">add more</a>');
+        if (err3) {
+          return res.end('Failed to upload to server: ' + err3);
+        } else {
+          res.setHeader('Content-Type', 'text/html');
+          return res.end('<html><body>Succeed to post book recommandation!<br><a href="/recommend">add more</a></body></html>');
+        }
       });
     });
   });
