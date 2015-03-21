@@ -170,7 +170,7 @@ router.postRecommendation = function(req, res) {
     var options = {
       hostname: app.get('DBServerIP'),  //'localhost'
       port: 3011,
-      path: '/recommendation',
+      path: '/recommendation2',
       method: 'POST'
     };
 

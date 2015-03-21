@@ -412,6 +412,18 @@ exports.addBookRecommendation = function(req, res, next) {
 
 exports.getBookRecommendation = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
+  var ret = {err: 0, title: 'test', summary:'test', thumbnail:'test.jpg'};
+  bookmodel.getLatestRecommendation(function(err, data) {
+    if (err) return res.end(JSON.stringify(data));
+    ret.title = data.title;
+    ret.summary = data.summary;
+    ret.thumbnail = data.thumbnail;
+    return res.end(JSON.stringify(ret));
+  });
+};
+
+exports.getBookRecommendation2 = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
   var ret = {err: 0, title: 'test', summary:'test', thumbnail:'test.jpg', rawdata: ''};
   bookmodel.getLatestRecommendation(function(err, data) {
     if (err) return res.end(JSON.stringify(data));

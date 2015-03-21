@@ -120,6 +120,8 @@ server.post('/book/category2', book.updateCategory2); // used for client only
 
 server.post('/recommendation', book.addBookRecommendation);
 server.get('/recommendation', book.getBookRecommendation);
+server.get('/recommendation2', book.getBookRecommendation2);
+
 
 // get bar information by id
 server.get('/bar/id/:id', bar.getBarById);
