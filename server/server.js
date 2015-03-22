@@ -88,7 +88,15 @@ server.get('/user/groups/:uid', user.getGroups);
 server.get('/user/feedbacks/:uid', user.getFeedbacks);
 
 server.get('/profile/:uid', user.getProfile);
+// update user profile, the request body contains profile information:
+// {
+//   uid: user-id, nickname: 'XXX', gender: 1/2, birthday: 'XXX', signature:'XXXX', hobby: 'XXX',
+//   job: 'XXX', edu: 'XXX', favoriteauthor: 'XXX', favoritebook: 'XXX',
+//   avatar: '0/1', avatardata: 'base64-image', avatarext: 'png|jpg'
+// }
+// if "avatar" is 0, do not update avatar, else update the avatar using base64-encoded "avatardata"
 server.post('/profile/:uid', user.setProfile);
+server.post('/profile2/:uid', user.setProfile2);
 
 
 server.get('/users', user.list);

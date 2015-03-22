@@ -94,6 +94,29 @@ exports.setProfile = function(req, res, next) {
    res.setHeader('Content-Type', 'text/json');
    var uid = req.params.uid;
    var profile = parseProfileFromRequest(req);
+   if (req.body.avatar == '1') {
+      // update avatar image
+      util.saveBase64Image({encode: 'base64', ext: req.body.avatarext, data: req.body.avatardata}, function(ret) {
+        if (ret.err) return res.end(JSON.stringify(ret));
+        profile.avatar = ret.name;
+        um.updateUserProfile(uid, profile, function(err, data) {
+         res.end(JSON.stringify(data));
+         next();
+        });
+      });
+   } else {
+     profile.avatar = null;
+     um.updateUserProfile(uid, profile, function(err, data) {
+       res.end(JSON.stringify(data));
+       next();
+     });
+   }
+};
+
+exports.setProfile2 = function(req, res, next) {
+   res.setHeader('Content-Type', 'text/json');
+   var uid = req.params.uid;
+   var profile = parseProfileFromRequest(req);
    um.updateUserProfile(uid, profile, function(err, data) {
      res.end(JSON.stringify(data));
      next();

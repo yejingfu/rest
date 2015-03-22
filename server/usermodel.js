@@ -400,7 +400,7 @@ exports.updateUserProfile = function(uid, profile, cb) {
       cb(err, data);
     } else {
       var srcProfile = data.profile;
-      console.log('dd--'+srcProfile + '--'+dstProfile);
+      //console.log('dd--'+srcProfile + '--'+dstProfile);
       profile = mergeProfile(srcProfile, dstProfile);
 
       var sql = 'update user_profile set nickname="'+profile.nickname+'", gender="'+profile.gender+'", birthday="'+profile.birthday+'", signature="'+profile.signature+'", hobby="'+profile.hobby+'", job="'+profile.job+'", edu="'+profile.edu+'", favoriteauthor="'+profile.favoriteauthor+'", favoritebook="'+profile.favoritebook+'", avatar="'+profile.avatar+'", updatedts="'+ts+'" where uid="'+uid+'" limit 1';

@@ -111,7 +111,7 @@ exports.getImageStreamByName = function(req, res, next) {
   });
 };
 
-var saveBase64Image = function(body, cb) {
+exports.saveBase64Image = function(body, cb) {
   var ret = {err: 0};
   var data = body.data;
   var ext = body.ext;
@@ -138,7 +138,7 @@ var saveBase64Image = function(body, cb) {
 
 exports.postImage = function(req, res, next) {
   res.setHeader('Content-Type', 'text/json');
-  saveBase64Image(req.body, function(ret) {
+  exports.saveBase64Image(req.body, function(ret) {
     res.end(JSON.stringify(ret));
   });
 };
