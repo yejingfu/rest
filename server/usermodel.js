@@ -405,12 +405,12 @@ exports.updateUserProfile = function(uid, profile, cb) {
 
       var sql = 'update user_profile set nickname="'+profile.nickname+'", gender="'+profile.gender+'", birthday="'+profile.birthday+'", signature="'+profile.signature+'", hobby="'+profile.hobby+'", job="'+profile.job+'", edu="'+profile.edu+'", favoriteauthor="'+profile.favoriteauthor+'", favoritebook="'+profile.favoritebook+'", avatar="'+profile.avatar+'", updatedts="'+ts+'" where uid="'+uid+'" limit 1';
       exeUpdate(sql, function(err, data) {
-        //cb(err, data);
         if (err) {
           ret = {err: errCode.DBFAILEDUPDATEPROFILE, msg: 'Failed to update user profile'};
         } else {
           ret = {err: errCode.OK, msg: 'Success to update user profile'};    
         }
+        cb(err, ret);
       });
     }
   });
