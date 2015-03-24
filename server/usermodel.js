@@ -278,6 +278,13 @@ exports.getUserBasicInfoByUID = function(uid, cb) {
       basicInfo.status = data.user.status;
       basicInfo.nickname = data2.profile.nickname;
       basicInfo.gender = data2.profile.gender;
+      basicInfo.birthday = data2.profile.birthday;
+      basicInfo.signature = data2.profile.signature;
+      basicInfo.hobby = data2.profile.hobby;
+      basicInfo.job = data2.profile.job;
+      basicInfo.edu = data2.profile.edu;
+      basicInfo.favoriteauthor = data2.profile.favoriteauthor;
+      basicInfo.favoritebook = data2.profile.favoritebook;
       basicInfo.avatar = data2.profile.avatar;
       cb(0, basicInfo);
     });

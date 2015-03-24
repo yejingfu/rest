@@ -328,7 +328,8 @@ var getCustomerList = function(barId, keepDup, cb) {
         cb(ret.err, ret);
       } else {
         // ids would be include user basic info, like blow:
-        //[['id1', 'phone', 'status', 'nickname', 'gender', 'avatar', 'createdts'], [...]]
+        //[['id1', 'phone', 'status', 'nickname', 'gender', 'birthday', 'signature', 'hobby', 'job', 'edu',
+        //  'favoriteauthor', 'favoritebook', 'avatar', 'createdts'], [...]]
         ids = Object.keys(idmap);
         len = ids.length;
         ret.uids = [];
@@ -338,7 +339,9 @@ var getCustomerList = function(barId, keepDup, cb) {
             um.getUserBasicInfoByUID(ids[idx], function(err2, data2) {
               count++;
               if (!err2) {
-                ret.uids.push([data2.uid, data2.phone, data2.status, data2.nickname, data2.gender, data2.avatar, idmap[ids[idx]]]);
+                ret.uids.push([data2.uid, data2.phone, data2.status, data2.nickname, data2.gender, 
+                  data2.birthday, data2.signature, data2.hobby, data2.job, data2.edu, data2.favoriteauthor,
+                  data2.favoritebook, data2.avatar, idmap[ids[idx]]]);
               }
               if (count === len) {
                 cb(0, ret);

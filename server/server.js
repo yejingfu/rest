@@ -162,7 +162,9 @@ server.post('/bar/dislike', bar.dislikeBar);
 // Get user id list who recently come in this bar
 // input: id(bar id)
 // output: array of user information, example:
-// [['id1', 'phone', 'status', 'nickname', 'gender', 'avatar', 'createdts'], [...]]
+// ids would be include user basic info, like blow:
+//[['id1', 'phone', 'status', 'nickname', 'gender', 'birthday', 'signature', 'hobby', 'job', 'edu',
+//  'favoriteauthor', 'favoritebook', 'avatar', 'createdts'], [...]]
 server.get('/bar/customers/:id', bar.getAllCustomers);
 // Call it if some user comes into this bar
 // input: barid(bar id), userid(user id)
