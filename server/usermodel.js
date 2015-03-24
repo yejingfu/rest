@@ -249,7 +249,7 @@ exports.getProfileByUID = function(uid, cb) {
       if (!profile) {
         ret = {err: errCode.DBUSERPROFILENOTEXIST, msg: 'user profile not exists!'};
       } else {
-        console.log('ddd:'+JSON.stringify(profile.toJSON()));
+        //console.log('ddd:'+JSON.stringify(profile.toJSON()));
         ret.profile = profile;
       }
       cb(ret.err, ret);
