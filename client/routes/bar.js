@@ -109,6 +109,11 @@ router.post('/add', function(req, res) {
     //console.log('bar: ' + fields['barName']+'--'+fields['barTel'] + '--' + fields['barAddress']+ '--' + fields['barDistrict']);
     //console.log('latitude:' + fields['barLat'] + ', longitude:' + fields['barLong']);
     //console.log('bar description:'+fields['barDesc']);
+
+    if (fields['barCHK'] != '654321') {
+      return res.end('The code code is not correct!!!');
+    }
+
     var images = files['barPhoto'];
     if (!images || images.length === 0) {
       res.end('Failed to upload image: no image received');
@@ -200,6 +205,10 @@ router.post('/edit/:barid', function(req, res) {
     if (!images || images.length === 0) {
       res.end('Failed to upload image: no image received');
       return;
+    }
+
+    if (fields['barCHK'] != '654321') {
+      return res.end('The code code is not correct!!!');
     }
 
     var i, len, count, validImages = [], validImageNames = [];
