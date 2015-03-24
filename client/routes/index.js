@@ -198,6 +198,11 @@ router.postRecommendation = function(req, res) {
   var form = new multiparty.Form();
   form.parse(req, function(err, fields, files) {
     if (err) return res.end("Failed to parse multiparty form");
+
+    if (fields['recCHK'] != '654321') {
+      return res.end('The code code is not correct!!!');
+    }
+
     var title = base64Encode(fields['recTitle'][0]);
     var summary = base64Encode(fields['recSummary'][0]);
     var thumbnail = files['recThumbnail'][0];
