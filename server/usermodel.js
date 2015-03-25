@@ -103,7 +103,7 @@ var extractUserProfileDTOFromDB = function(profile) {
 
 var mergeProfile = function(src, dst) {
   src.nickname = dst.nickname || src.nickname;
-  src.gender = dst.gender || src.gender;
+  src.gender = dst.gender; // || src.gender;
   src.birthday = dst.birthday || src.birthday;
   src.signature = dst.signature || src.signature;
   src.hobby = dst.hobby || src.hobby;
