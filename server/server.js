@@ -98,6 +98,10 @@ server.get('/profile/:uid', user.getProfile);
 server.post('/profile/:uid', user.setProfile);
 server.post('/profile2/:uid', user.setProfile2);
 
+// reset password, input:
+// {phone: phone, pwd: password, magic: PasSWoRd}
+server.post('/user/resetpwd', user.resetpwd);
+
 
 server.get('/users', user.list);
 

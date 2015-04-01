@@ -247,3 +247,21 @@ exports.getFeedbacks = function(req, res, next) {
   });
 };
 
+exports.resetpwd = function(req, res, next) {
+  res.setHeader('Content-Type', 'text/json');
+  var phone = req.body.phone;
+  var pwd = req.body.pwd;
+  var magic = req.body.magic || 0;
+  
+  var ret = {err: 0, msg: ''};
+  if (!phone || !pwd || magic != 'PasSWoRd') {
+    ret.err = 1;
+    ret.msg = 'wrong input!';
+    return res.end(JSON.stringify(ret));
+  }
+
+  um.updateUser(phone, pwd, undefined, function(err, data) {
+    return res.end(JSON.stringify(data));
+  });
+};
+
